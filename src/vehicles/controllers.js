@@ -1,61 +1,86 @@
 const { pool } = require('../db/db');
 
-const getVehicles = (req, res) => {
-    pool.query('SELECT * FROM vehicles', (error, results) => {
-        if (error) {
-            throw error;
-        }
-        res.status(200).json(results);
-    });
+const Pool = pool.promise();
+
+// Centralized error handler
+const handleError = (res, error) => {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred, please try again later.' });
 };
 
-const getVehicleById = (req, res) => {
-    const id = parseInt(req.params.id);
-    pool.query('SELECT * FROM vehicles WHERE id = ?', [id], (error, results) => {
-        if (error) {
-            throw error;
+// Reusable query handler function
+const handleQuery = async (res, query, params = [], successStatus = 200, singleResult = false) => {
+    try {
+        const { rows, rowCount } = await Pool.query(query, params);
+        if (singleResult && rowCount === 0) {
+            return res.status(404).json({ message: 'Resource not found' });
         }
-        res.status(200).json(results);
-    });
+        res.status(successStatus).json(singleResult ? rows[0] : rows);
+    } catch (error) {
+        handleError(res, error);
+    }
 };
 
-const createVehicle = (req, res) => {
-    const { driver, seats, make, model, year, color, mileage } = req.body;
-    pool.query(
-        'INSERT INTO vehicles (driver, seats, make, model, year, color, mileage) VALUES (?, ?, ?, ?, ?, ?, ? ) RETURNING *',
-        [ driver, seats, make, model, year, color, mileage],
-        (error, results) => {
-            if (error) {
-                throw error;
-            }
-            res.status(201).json(results[0]);
-        }
-    );
+const getVehicles = async (req, res) => {
+    const sql = 'SELECT * FROM vehicles';
+    try {
+        const results = await Pool.query(sql);
+        res.status(200).json(results[0]);
+    } catch (error) {
+        throw error;
+    };
 };
 
-const  updateVehicle = (req, res) => {
-    const id = parseInt(req.params.id);
-    const { driver, seats, make, model, year, color, mileage } = req.body;
-    pool.query(
-        'UPDATE vehicles SET driver = $1, seats = $2, make = $3, model = $4, year = $5, color = $6, mileage = $7 WHERE id = $8',
-        [ driver, seats, make, model, year, color, mileage, id],
-        (error, results) => {
-            if (error) {
-                throw error;
-            }
-            res.status(200).send(`Vehicle modified with ID: ${id}`);
+const getVehicleById = async (req, res) => {
+    const sql = 'SELECT * FROM vehicles WHERE id = ?';
+    try {
+        const id = parseInt(req.params.id);
+        const results = await Pool.query( sql, [id]);
+
+        if (results.length === 0) {
+            // Handle case where no vehicle with the given ID is found
+            return res.status(404).json({ message: 'Vehicle not found' });
         }
-    );
+
+        res.status(200).json(results[0]); // Assuming only one vehicle per ID
+    } catch (error) {
+        throw error;
+    };
 };
 
-const deleteVehicle = (req, res) => {
-    const id = parseInt(req.params.id);
-    pool.query('DELETE FROM vehicles WHERE id = $1', [id], (error, results) => {
-        if (error) {
-            throw error;
-        }
+const createVehicle = async (req, res) => {
+    const sql = 'INSERT INTO vehicles (driver, seats, make, model, year, color, mileage) VALUES (?, ?, ?, ?, ?, ?, ?)';
+    try {
+        const { driver, seats, make, model, year, color, mileage } = req.body;
+        const results = await Pool.query( sql, [driver, seats, make, model, year, color, mileage] );
+        res.status(201).json(results[0]);
+    } catch (error) {
+        throw error;
+    };
+};
+
+const updateVehicle = async (req, res) => {
+    const sql = 'UPDATE vehicles SET driver = ?, seats = ?, make = ?, model = ?, year = ?, color = ?, mileage = ? WHERE id = ?';
+    try {
+        const id = parseInt(req.params.id);
+        const { driver, seats, make, model, year, color, mileage } = req.body;
+        await Pool.query( sql, [driver, seats, make, model, year, color, mileage, id]
+        );
+        res.status(200).send(`Vehicle modified with ID: ${id}`);
+    } catch (error) {
+        throw error;
+    };
+};
+
+const deleteVehicle = async (req, res) => {
+    const sql = 'DELETE FROM vehicles WHERE id = ?';
+    try {
+        const id = parseInt(req.params.id);
+        await Pool.query( sql, [id]);
         res.status(200).send(`Vehicle deleted with ID: ${id}`);
-    });
+    } catch (error) {
+        throw error;
+    };
 };
 
 module.exports = {

@@ -1,5 +1,6 @@
 const dotenv = require('dotenv'); // Importing the ".env" file
 const mysql2 = require("mysql2");
+
 dotenv.config(); // Loading the ".env" file
 
 const RETRY_LIMIT = 5; // Number of connection retry attempts
