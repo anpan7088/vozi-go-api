@@ -1,4 +1,4 @@
-const { pool } = require('../db/db');
+import { pool } from '../db/db.mjs';
 
 const getCitiesByName = async (req, res) => {
     const sql = `CALL SearchCitiesByName(?);`;
@@ -10,28 +10,27 @@ const getCitiesByName = async (req, res) => {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
-            sqlError: err.sqlMessage
+            sqlError: err.sqlMessage,
         });
     }
 };
 
 const getCitiesByCountry = async (req, res) => {
     const sql = `CALL SearchCitiesByCountry(?);`;
-
     try {
         const country = req.params.country;
-        const [results] = await pool.promise().query(sql, [country]);
+        const [results] = await pool.promise().execute(sql, [country]);
         res.json({ count: results[0].length, data: results[0] });
     } catch (err) {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
-            sqlError: err.sqlMessage
+            sqlError: err.sqlMessage,
         });
     }
 };
 
-module.exports = {
+export {
     getCitiesByName,
-    getCitiesByCountry
+    getCitiesByCountry,
 };

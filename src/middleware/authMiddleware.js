@@ -1,11 +1,13 @@
 // middleware/authMiddleware.js
-const { pool } = require('../db/db');
-const jwt = require('jsonwebtoken');
+// Import necessary modules using ES Modules syntax
+import { pool } from '../db/db.mjs';
+import jwt from 'jsonwebtoken';
 
+// Secret key for JWT
 const secretKey = process.env.JWT_SECRET_KEY || 'defaultSecretKey-eohfufiufrei';
 
 // isUser middleware, assuming user_id is stored in the token payload
-const isUser = (req, res, next) => {
+export const isUser = (req, res, next) => {
     const token = req.header('Authorization');
 
     if (!token) {
@@ -21,7 +23,7 @@ const isUser = (req, res, next) => {
 };
 
 // isOwner middleware, assuming user_id is stored in the token payload
-const isOwner = async (req, res, next) => {
+export const isOwner = async (req, res, next) => {
     const reviewToDel = req.params.id;
     try {
         const [result] = await pool.promise().query('SELECT user_id FROM dorms_review WHERE id = ?', [reviewToDel]);
@@ -37,7 +39,7 @@ const isOwner = async (req, res, next) => {
 };
 
 // isAdmin middleware, assuming admin role is 'admin' and role is stored in the token payload
-const isAdmin = (req, res, next) => {
+export const isAdmin = (req, res, next) => {
     const token = req.header('Authorization');
 
     if (!token) {
@@ -61,7 +63,7 @@ const isAdmin = (req, res, next) => {
 };
 
 // isAdminOrOwner middleware, assuming admin role is 'admin' and role is stored in the token payload
-const isAdminOrOwner = async (req, res, next) => {
+export const isAdminOrOwner = async (req, res, next) => {
     const token = req.header('Authorization');
 
     if (!token) {
@@ -88,5 +90,3 @@ const isAdminOrOwner = async (req, res, next) => {
         return res.status(401).json({ error: 'Unauthorized: Invalid token' });
     }
 };
-
-module.exports = { isUser, isAdmin, isOwner, isAdminOrOwner };

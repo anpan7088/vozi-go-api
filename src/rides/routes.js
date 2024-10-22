@@ -1,7 +1,8 @@
-const express = require('express');
-const { getAllRides, getRideById, createRide, updateRide, deleteRide } = require('./controllers');
+import { Router } from 'express';
+import * as controllers from './controllers.js';
+const { getAllRides, getRideById, createRide, updateRide, deleteRide } = controllers;
 
-const router = express.Router();
+const router = Router();
 
 router.get('/', getAllRides);
 router.get('/:id', getRideById);
@@ -9,5 +10,5 @@ router.post('/', createRide);
 router.put('/:id', updateRide);
 router.delete('/:id', deleteRide);
 
-module.exports = router;
+export default router;
 

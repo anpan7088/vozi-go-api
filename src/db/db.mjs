@@ -1,7 +1,9 @@
-const dotenv = require('dotenv'); // Importing the ".env" file
-const mysql2 = require("mysql2");
+// Importing the required modules using ES module syntax
+import dotenv from 'dotenv'; // Importing the ".env" file
+import mysql2 from 'mysql2';
 
-dotenv.config(); // Loading the ".env" file
+// Loading the ".env" file
+dotenv.config();
 
 const RETRY_LIMIT = 5; // Number of connection retry attempts
 const RETRY_DELAY = 5000; // Delay between retries in milliseconds (5 seconds)
@@ -39,7 +41,6 @@ const createPoolWithRetry = (retryCount = 0) => {
     return pool;
 };
 
-
 const safeEscape = (value) => {
     if (value === null || value === undefined) {
         return 'NULL';
@@ -62,12 +63,10 @@ const safeEscape = (value) => {
         default:
             throw new Error('Unsupported data type');
     }
-}
-
-
-const pool = createPoolWithRetry(); // Create the pool with retry logic
-
-module.exports = {
-    pool,            // Export the pool for use in other parts of the application
-    safeEscape
 };
+
+// Create the pool with retry logic
+const pool = createPoolWithRetry();
+
+// Export the pool and safeEscape function using ES module syntax
+export { pool, safeEscape };

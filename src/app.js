@@ -1,63 +1,53 @@
-// app.js
-const express = require("express");
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
+// Importing necessary modules
+import express, { json, urlencoded } from "express";
+import cors from 'cors';
+import jwt from 'jsonwebtoken'; // If you use jwt later in the file, otherwise remove this import
 
-const authRoutes = require('./auth/routes'); // Import the auth routes module
-const userProfileRoutes = require('./userProfiles/routes'); // Import the user routes module
+// Importing routes
+import authRoutes from './auth/routes.js';  // Explicitly specify the file extension
+import userProfileRoutes from './userProfiles/routes.js';  // Ensure .js extension for ESM
+import citiesRoutes from './cities/routes.js';  // Adjusted for ES Modules
+import vehicleRoutes from './vehicles/routes.js';  // Adjusted for ES Modules
+import ridesRoutes from './rides/routes.js';  // Adjusted for ES Modules
+import driversRoutes from './drivers/routes.js';  // Adjusted for ES Modules
 
 const PORT = process.env.PORT || 8088;
 
-// Define allowed origins based on environment
-// const allowedOrigins = ['https://DORMS.sman.cloud', 'http://localhost:5173', 'http://localhost:5173/', 'http://localhost/'];
-
+// Define allowed origins for CORS based on environment
 const corsOptions = {
-    origin: [ // Allow only this origins
+    origin: [
         'https://dorms.sman.cloud', 
         'http://localhost:5173',
         'http://158.220.121.142:5173',
-    ], 
-
-    methods:
-        'GET,HEAD,PUT,PATCH,POST,DELETE',
-
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204
 };
 
-// create express app inctance and set cors options
+// Create express app instance and set cors options
 const app = express();
-app.use(cors(corsOptions))
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions));
+app.use(json());
+app.use(urlencoded({ extended: true }));
 
+// Root route
 app.get("/", (req, res) => {
     res.send({ "message": "Welcome to Vozi-Go API!" });
 });
 
-// Serve static files from the 'uploads' directory
+// Serve static files from the 'public' directory
 app.use('/public', express.static('public'));
 
-// Use the auth routes
+// Use the routes
 app.use("/auth", authRoutes);
-
-// Use user profile routes
 app.use("/user", userProfileRoutes);
+app.use("/cities", citiesRoutes);
+app.use("/vehicles", vehicleRoutes);
+app.use("/rides", ridesRoutes);
+app.use("/drivers", driversRoutes);
 
-// Use cities routes
-app.use("/cities", require('./cities/routes'));
-
-// Use vehicle routes
-app.use("/vehicles", require('./vehicles/routes'));
-
-// Use rides routes
-app.use("/rides", require('./rides/routes'));
-
-// Start server on port 8088 or process.env.PORT from .env file
+// Start server on port 8088 or from process.env.PORT
 app.listen(PORT, () => {
     console.log("App is running on port " + PORT);
 });
-
-
-// Define allowed origins based on environment
-// const allowedOrigins = ['https://drm-front.sman.cloud', 'http://localhost:5173', 'http://localhost:5173/', 'http://localhost/'];

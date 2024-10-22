@@ -1,10 +1,8 @@
-// user/controllers.js
-const { pool } = require('../db/db'); // Adjust the path to the db module
+import { pool } from '../db/db.mjs'; // Adjust the path to the db module
 const usersTable = process.env.USERS_TABLE || 'users';
 
-// get current user profile
-const getUserProfile = async (req, res) => {
-
+// Get current user profile
+export const getUserProfile = async (req, res) => {
     // Get user_id from query parameters if present, otherwise use req.user.id
     const userId = req.params.user_id || req.user.id;
 
@@ -21,15 +19,14 @@ const getUserProfile = async (req, res) => {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
-            sqlError: err.sqlMessage
+            sqlError: err.sqlMessage,
         });
     }
 };
 
-// list all users
-const listAllUsers = async (req, res) => {
-
-    // select all users with review count
+// List all users
+export const listAllUsers = async (req, res) => {
+    // Select all users with review count
     const sql = `
         SELECT u.*
         FROM ${usersTable} u
@@ -47,19 +44,18 @@ const listAllUsers = async (req, res) => {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
-            sqlError: err.sqlMessage
+            sqlError: err.sqlMessage,
         });
     }
 };
 
 // PATCH CURRENT USER PROFILE
-const patchUserProfile = async (req, res) => {
-
+export const patchUserProfile = async (req, res) => {
     // Get user_id from query parameters if present, otherwise use req.user.id
     const userId = req.params.user_id || req.user.id;
     const fieldsToUpdate = req.body;
 
-    // empty list to store the fields to update
+    // Empty list to store the fields to update
     let updateFields = [];
     let updateValues = [];
 
@@ -75,7 +71,7 @@ const patchUserProfile = async (req, res) => {
 
     updateValues.push(userId);
 
-    // Construct the SQL query, from the list of fields to update
+    // Construct the SQL query from the list of fields to update
     const sql = `UPDATE ${usersTable} SET ${updateFields.join(", ")} WHERE id = ?`;
 
     // Execute the SQL query
@@ -84,39 +80,33 @@ const patchUserProfile = async (req, res) => {
         res.json({
             status: true,
             message: 'Profile updated successfully',
-            values: fieldsToUpdate
+            values: fieldsToUpdate,
         });
     } catch (err) {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
-            sqlError: err.sqlMessage
+            sqlError: err.sqlMessage,
         });
     }
 };
 
-const deleteUserProfile = async (req, res) => {
+// Delete user profile
+export const deleteUserProfile = async (req, res) => {
     const userId = req.params.user_id;
     const sql = `DELETE FROM ${usersTable} WHERE id = ?`;
+    
     try {
         await pool.promise().query(sql, [userId]);
         res.json({
             status: true,
-            message: 'Profile deleted successfully'
+            message: 'Profile deleted successfully',
         });
     } catch (err) {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
-            sqlError: err.sqlMessage
+            sqlError: err.sqlMessage,
         });
     }
-};
-
-// EXPORT
-module.exports = {
-    getUserProfile,
-    listAllUsers,
-    patchUserProfile,
-    deleteUserProfile
 };
