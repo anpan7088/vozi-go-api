@@ -2,7 +2,7 @@ import { pool } from '../db/db.mjs';
 
 // Function to get the list of active drivers
 export const getDriversList = async (req, res) => {
-    const sql = `SELECT * FROM drivers WHERE is_active = 1 AND role = 'driver'`;
+    const sql = `SELECT * FROM users WHERE is_active = 1 AND role = 'driver'`;
 
     try {
         const [results] = await pool.promise().query(sql);
