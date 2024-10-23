@@ -10,6 +10,7 @@ import citiesRoutes from './cities/routes.js';  // Adjusted for ES Modules
 import vehicleRoutes from './vehicles/routes.js';  // Adjusted for ES Modules
 import ridesRoutes from './rides/routes.js';  // Adjusted for ES Modules
 import driversRoutes from './drivers/routes.js';  // Adjusted for ES Modules
+import rolesRoutes from './roles/routes.js';  // Adjusted for ES Modules
 
 const PORT = process.env.PORT || 8088;
 
@@ -42,6 +43,7 @@ app.use('/public', express.static('public'));
 // Use the routes
 app.use("/auth", authRoutes);
 app.use("/user", userProfileRoutes);
+app.use("/roles", rolesRoutes);
 app.use("/cities", citiesRoutes);
 app.use("/vehicles", vehicleRoutes);
 app.use("/rides", ridesRoutes);
