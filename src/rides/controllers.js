@@ -1,10 +1,75 @@
 import { pool } from '../db/db.mjs';
 
-// Get all rides
-export const getAllRides = async (req, res) => {
-    const sql = 'SELECT * FROM rides';
+// Base query
+const masterQuery = `
+    SELECT 
+        rides.id AS rideID,
+        rides.start_time,
+        depart_mesta.city as depart,
+        dest_mesta.city as dest,
+        depart_mesta.country as depart_country,
+        dest_mesta.country as dest_country,
+        users.id userID,
+        users.username username,
+        users.firstName,
+        users.lastName,
+        vehicles.make,
+        vehicles.model,
+        vehicles.seats,
+        vehicles.color,
+        vehicles.license_plate
+    FROM rides
+    INNER JOIN mesta AS depart_mesta ON depart_mesta.id=rides.depart
+    INNER JOIN mesta AS dest_mesta ON dest_mesta.id=rides.destination
+    INNER JOIN vehicles ON vehicles.id=rides.vehicle
+    INNER JOIN users ON users.id=vehicles.driver
+`;
+
+// Get all rides with filters
+export const getRides = async (req, res) => {
+    const { search, sort, departFilter, destFilter, voziloFilter } = req.query;
+console.log(req.query);
+    // Initialize conditions array and parameters array for SQL
+    let conditions = [];
+    let params = [];
+
+    // Add conditions based on filters
+    if (departFilter) {
+        conditions.push(`depart_mesta.city = ?`);
+        params.push(departFilter);
+    }
+
+    if (destFilter) {
+        conditions.push(`dest_mesta.city = ?`);
+        params.push(destFilter);
+    }
+
+    if (voziloFilter) {
+        conditions.push(`vehicles.make = ?`);
+        params.push(voziloFilter);
+    }
+
+    if (search) {
+        conditions.push(`(users.username LIKE ? OR users.firstName LIKE ? OR users.lastName LIKE ?)`);
+        const searchParam = `%${search}%`;
+        params.push(searchParam, searchParam, searchParam);
+    }
+
+    // Add WHERE clause if there are any conditions
+    let whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
+
+    // Add sorting if provided, else default to sorting by start_time
+    let orderBy = 'ORDER BY rides.start_time DESC';
+    if (sort) {
+        orderBy = `ORDER BY ${sort}`;
+    }
+
+    // Combine the query
+    const sql = `${masterQuery} ${whereClause} ${orderBy}`;
+
     try {
-        const [result] = await pool.promise().query(sql);
+        // Execute the query with parameters
+        const [result] = await pool.promise().query(sql, params);
         res.json(result);
     } catch (err) {
         res.status(500).send(err);
@@ -64,10 +129,10 @@ export const deleteRide = async (req, res) => {
 };
 
 // Default export of all functions
-export default {
-    createRide,
-    getAllRides,
-    getRideById,
-    updateRide,
-    deleteRide,
-};
+// export default {
+//     createRide,
+//     getRides,
+//     getRideById,
+//     updateRide,
+//     deleteRide,
+// };
