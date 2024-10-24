@@ -1,14 +1,16 @@
 import { pool } from '../db/db.mjs';
 
-// Base query
+// Get all rides master query
 const masterQuery = `
     SELECT 
         rides.id AS rideID,
         rides.start_time,
         depart_mesta.city as depart,
-        dest_mesta.city as dest,
         depart_mesta.country as depart_country,
+        depart_mesta.id as depart_mesta_id,
+        dest_mesta.city as dest,
         dest_mesta.country as dest_country,
+        dest_mesta.id as dest_mesta_id,
         users.id userID,
         users.username username,
         users.firstName,
@@ -25,10 +27,20 @@ const masterQuery = `
     INNER JOIN users ON users.id=vehicles.driver
 `;
 
+// Query to count total rides matching filters
+const countQuery = `
+    SELECT COUNT(*) as total
+    FROM rides
+    INNER JOIN mesta AS depart_mesta ON depart_mesta.id=rides.depart
+    INNER JOIN mesta AS dest_mesta ON dest_mesta.id=rides.destination
+    INNER JOIN vehicles ON vehicles.id=rides.vehicle
+    INNER JOIN users ON users.id=vehicles.driver
+`;
+
 // Get all rides with filters
 export const getRides = async (req, res) => {
-    const { search, sort, departFilter, destFilter, voziloFilter } = req.query;
-console.log(req.query);
+    const { search, sort, departFilter, destFilter, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1 } = req.query;
+
     // Initialize conditions array and parameters array for SQL
     let conditions = [];
     let params = [];
@@ -49,6 +61,21 @@ console.log(req.query);
         params.push(voziloFilter);
     }
 
+    if (departMestaId) {
+        conditions.push(`depart_mesta.id = ?`);
+        params.push(departMestaId);
+    }
+
+    if (destMestaId) {
+        conditions.push(`dest_mesta.id = ?`);
+        params.push(destMestaId);
+    }
+
+    if (licensePlate) {
+        conditions.push(`vehicles.license_plate = ?`);
+        params.push(licensePlate);
+    }
+
     if (search) {
         conditions.push(`(users.username LIKE ? OR users.firstName LIKE ? OR users.lastName LIKE ?)`);
         const searchParam = `%${search}%`;
@@ -64,13 +91,40 @@ console.log(req.query);
         orderBy = `ORDER BY ${sort}`;
     }
 
-    // Combine the query
-    const sql = `${masterQuery} ${whereClause} ${orderBy}`;
+    // Pagination: calculate offset and limit
+    const limitValue = parseInt(limit, 10) || 10;  // Default to 10 results per page if not provided
+    const pageValue = parseInt(page, 10) || 1;     // Default to page 1 if not provided
+    const offset = (pageValue - 1) * limitValue;
+
+    // Combine the query with pagination (LIMIT and OFFSET)
+    const sql = `${masterQuery} ${whereClause} ${orderBy} LIMIT ? OFFSET ?`;
+
+    // Add limit and offset to params array
+    params.push(limitValue, offset);
 
     try {
-        // Execute the query with parameters
-        const [result] = await pool.promise().query(sql, params);
-        res.json(result);
+        // Step 1: Get the total count of rides (for pagination)
+        const totalSql = `${countQuery} ${whereClause}`;
+        const [totalResult] = await pool.promise().query(totalSql, params);
+        const totalRides = totalResult[0].total;
+
+        // Step 2: Calculate the number of pages
+        const totalPages = Math.ceil(totalRides / limitValue);
+
+        // Step 3: Get the rides with pagination (LIMIT and OFFSET)
+        const sql = `${masterQuery} ${whereClause} ${orderBy} LIMIT ? OFFSET ?`;
+        params.push(limitValue, offset);
+
+        const [ridesResult] = await pool.promise().query(sql, params);
+
+        // Step 4: Send the response with pagination data
+        res.json({
+            page: pageValue,
+            limit: limitValue,
+            totalResults: totalRides,
+            totalPages: totalPages,
+            rides: ridesResult
+        });
     } catch (err) {
         res.status(500).send(err);
     }
@@ -127,12 +181,3 @@ export const deleteRide = async (req, res) => {
         res.status(500).send(err);
     }
 };
-
-// Default export of all functions
-// export default {
-//     createRide,
-//     getRides,
-//     getRideById,
-//     updateRide,
-//     deleteRide,
-// };
