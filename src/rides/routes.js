@@ -1,10 +1,19 @@
 import { Router } from 'express';
-import * as controllers from './controllers.js';
-const { getRides, getRideById, createRide, updateRide, deleteRide } = controllers;
+import { 
+    getRides, 
+    getRideById, 
+    createRide, 
+    updateRide, 
+    deleteRide, 
+    getDepartList,
+    getDestList,
+} from './controllers.js';
 
 const router = Router();
 
 router.get('/', getRides);
+router.get('/departList', getDepartList);
+router.get('/destList', getDestList);
 router.get('/:id', getRideById);
 router.post('/', createRide);
 router.put('/:id', updateRide);

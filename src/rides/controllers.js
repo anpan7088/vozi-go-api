@@ -23,7 +23,7 @@ const masterQuery = `
     FROM rides
     INNER JOIN mesta AS depart_mesta ON depart_mesta.id=rides.depart
     INNER JOIN mesta AS dest_mesta ON dest_mesta.id=rides.destination
-    INNER JOIN vehicles ON vehicles.id=rides.vehicle
+    INNER JOIN vehicles ON vehicles.id=rides.vehicle_id
     INNER JOIN users ON users.id=vehicles.driver
 `;
 
@@ -33,27 +33,57 @@ const countQuery = `
     FROM rides
     INNER JOIN mesta AS depart_mesta ON depart_mesta.id=rides.depart
     INNER JOIN mesta AS dest_mesta ON dest_mesta.id=rides.destination
-    INNER JOIN vehicles ON vehicles.id=rides.vehicle
+    INNER JOIN vehicles ON vehicles.id=rides.vehicle_id
     INNER JOIN users ON users.id=vehicles.driver
 `;
 
+const departListQuery = `
+    SELECT distinct(depart) as id, mesta.city FROM rides 
+    INNER JOIN mesta on mesta.id=rides.depart
+`;
+
+const destListQuery = `
+    SELECT distinct(destination) as id, mesta.city FROM rides
+    INNER JOIN mesta on mesta.id=rides.destination
+`;
+
+// Get Depart list
+export const getDepartList = async (req, res) => {
+    try {
+        const [departList] = await pool.promise().query(departListQuery);
+        res.json(departList);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
+// Get Dest list
+export const getDestList = async (req, res) => {
+    try {
+        const [destList] = await pool.promise().query(destListQuery);
+        res.json(destList);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
 // Get all rides with filters
 export const getRides = async (req, res) => {
-    const { search, sort, departFilter, destFilter, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1 } = req.query;
+    const { search, sort, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1 } = req.query;
 
     // Initialize conditions array and parameters array for SQL
     let conditions = [];
     let params = [];
 
     // Add conditions based on filters
-    if (departFilter) {
+    if (departMesta) {
         conditions.push(`depart_mesta.city = ?`);
-        params.push(departFilter);
+        params.push(departMesta);
     }
 
-    if (destFilter) {
+    if (destMesta) {
         conditions.push(`dest_mesta.city = ?`);
-        params.push(destFilter);
+        params.push(destMesta);
     }
 
     if (voziloFilter) {
@@ -181,3 +211,14 @@ export const deleteRide = async (req, res) => {
         res.status(500).send(err);
     }
 };
+
+
+export default {
+    getRides,
+    getRideById,
+    createRide,
+    updateRide,
+    deleteRide,
+    getDepartList,
+    getDestList
+}

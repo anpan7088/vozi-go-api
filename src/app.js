@@ -15,11 +15,15 @@ import rolesRoutes from './roles/routes.js';  // Adjusted for ES Modules
 const PORT = process.env.PORT || 8088;
 
 // Define allowed origins for CORS based on environment
+// for development, you can use 'http://localhost:5173' and 'http://localhost:5174'
+// for production, you can use 'https://vozi-go.sman.cloud' and all localhost other URLs should be blocked
 const corsOptions = {
     origin: [
-        'https://dorms.sman.cloud', 
+        'https://vozi-go.sman.cloud', 
         'http://localhost:5173',
+        'http://localhost:5174',
         'http://158.220.121.142:5173',
+        'http://158.220.121.142:5174',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
