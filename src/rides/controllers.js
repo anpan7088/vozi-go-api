@@ -58,7 +58,9 @@ SELECT
     vehicles.make as make,
     vehicles.model as model,
     vehicles.color as color,
-    vehicles.license_plate as license_plate
+    vehicles.license_plate as license_plate,
+    concat( users.firstName, ' ', users.lastName) as driver_name,
+    users.tel as driver_tel
 from rides
 
 INNER JOIN vehicles on vehicles.id = rides.vehicle_id
