@@ -47,6 +47,28 @@ const destListQuery = `
     INNER JOIN mesta on mesta.id=rides.destination
 `;
 
+const rideDetailQuery = `
+SELECT 
+	rides.id, 
+    depart.city as depart,
+    dest.city as dest,
+    rides.start_time as start_time,
+    vehicles.seats as seats,
+    rides.price as price,
+    vehicles.make as make,
+    vehicles.model as model,
+    vehicles.color as color,
+    vehicles.license_plate as license_plate
+from rides
+
+INNER JOIN vehicles on vehicles.id = rides.vehicle_id
+INNER JOIN users on users.id = vehicles.driver
+INNER JOIN mesta as depart on depart.id = rides.depart
+INNER JOIN mesta as dest on dest.id = rides.destination
+
+WHERE rides.id = ?
+`;
+
 // Get Depart list
 export const getDepartList = async (req, res) => {
     try {
@@ -163,7 +185,7 @@ export const getRides = async (req, res) => {
 // Get a ride by ID
 export const getRideById = async (req, res) => {
     const { id } = req.params;
-    const sql = 'SELECT * FROM rides WHERE id = ?';
+    const sql = rideDetailQuery;
     try {
         const [result] = await pool.promise().query(sql, [id]);
         if (result.length === 0) return res.status(404).json({ message: 'Ride not found' });
