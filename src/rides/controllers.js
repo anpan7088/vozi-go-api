@@ -21,7 +21,8 @@ const masterQuery = `
         vehicles.model,
         vehicles.seats,
         vehicles.color,
-        vehicles.license_plate
+        vehicles.license_plate,
+        CASE WHEN rides.start_time < NOW() THEN true ELSE false END AS expired
     FROM rides
     INNER JOIN mesta AS depart_mesta ON depart_mesta.id=rides.depart
     INNER JOIN mesta AS dest_mesta ON dest_mesta.id=rides.destination
@@ -55,6 +56,8 @@ SELECT
     depart.city as depart,
     dest.city as dest,
     rides.start_time as start_time,
+    DATE_FORMAT(rides.start_time, '%Y-%m-%d') AS depart_date,
+    DATE_FORMAT(rides.start_time, '%H:%i') AS depart_time,
     vehicles.seats as seats,
     rides.price as price,
     vehicles.make as make,
@@ -62,7 +65,10 @@ SELECT
     vehicles.color as color,
     vehicles.license_plate as license_plate,
     concat( users.firstName, ' ', users.lastName) as driver_name,
-    users.tel as driver_tel
+    users.tel as driver_tel,
+    users.email as driver_email,
+    concat(users.address, ', ', users.city, ', ', users.country) as driver_address,
+    CASE WHEN rides.start_time < NOW() THEN true ELSE false END AS expired
 from rides
 
 INNER JOIN vehicles on vehicles.id = rides.vehicle_id
@@ -155,7 +161,7 @@ export const getRides = async (req, res) => {
         conditions.push(`rides.start_time > ?`);
         params.push(afterTimestamp);
     }
-    
+
     // Add WHERE clause if there are any conditions
     let whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
