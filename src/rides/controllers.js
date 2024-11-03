@@ -5,6 +5,8 @@ const masterQuery = `
     SELECT 
         rides.id AS rideID,
         rides.start_time,
+        DATE_FORMAT(rides.start_time, '%Y-%m-%d') AS depart_date,
+        DATE_FORMAT(rides.start_time, '%H:%i') AS depart_time,
         depart_mesta.city as depart,
         depart_mesta.country_id as depart_country_id,
         depart_mesta.id as depart_mesta_id,
@@ -93,8 +95,8 @@ export const getDestList = async (req, res) => {
 
 // Get all rides with filters
 export const getRides = async (req, res) => {
-    const { search, sort, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1 } = req.query;
-
+    // const { search, sort, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1 } = req.query;
+    const { search, sort, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1, before, after, beforeTimestamp, afterTimestamp } = req.query;
     // Initialize conditions array and parameters array for SQL
     let conditions = [];
     let params = [];
@@ -136,6 +138,24 @@ export const getRides = async (req, res) => {
         params.push(searchParam, searchParam, searchParam);
     }
 
+    if (before === 'true') {
+        conditions.push(`rides.start_time < NOW()`);
+    }
+
+    if (after === 'true') {
+        conditions.push(`rides.start_time > NOW()`);
+    }
+
+    if (beforeTimestamp) {
+        conditions.push(`rides.start_time < ?`);
+        params.push(beforeTimestamp);
+    }
+
+    if (afterTimestamp) {
+        conditions.push(`rides.start_time > ?`);
+        params.push(afterTimestamp);
+    }
+    
     // Add WHERE clause if there are any conditions
     let whereClause = conditions.length ? `WHERE ${conditions.join(' AND ')}` : '';
 
