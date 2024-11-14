@@ -223,32 +223,42 @@ export const getRideById = async (req, res) => {
     }
 };
 
-// Create a new ride
 export const createRide = async (req, res) => {
-    const { depart, destination, start_time, vehicle } = req.body;
-    const sql = 'INSERT INTO rides (depart, destination, start_time, vehicle) VALUES (?, ?, ?, ?)';
+    // Construct the SQL query dynamically based on the provided fields
+    const fields = Object.keys(req.body);
+    const placeholders = fields.map(() => '?').join(',');
+    const sql = `INSERT INTO rides (${fields.join(', ')}) VALUES (${placeholders})`;
+  
+    // Prepare the values for the SQL query
+    const values = fields.map((field) => req.body[field]);
+  
     try {
-        const [result] = await pool.promise().query(sql, [depart, destination, start_time, vehicle]);
-        res.status(201).json({ id: result.insertId, depart, destination, start_time, vehicle });
+      const [result] = await pool.promise().query(sql, values);
+      res.status(201).json({ id: result.insertId, ...req.body });
     } catch (err) {
-        res.status(500).send(err);
+      res.status(500).send(err);
     }
-};
+  };
 
-// Update a ride by ID
 export const updateRide = async (req, res) => {
-    const { id } = req.params;
-    const { depart, destination, start_time, vehicle } = req.body;
-    const sql = 'UPDATE rides SET depart = ?, destination = ?, start_time = ?, vehicle = ? WHERE id = ?';
-    try {
-        const [result] = await pool.promise().query(sql, [depart, destination, start_time, vehicle, id]);
-        if (result.affectedRows === 0) return res.status(404).json({ message: 'Ride not found' });
-        res.json({ message: 'Ride updated successfully' });
-    } catch (err) {
-        res.status(500).send(err);
-    }
-};
+  const { id } = req.params;
+  
+  // Extract fields that have changed
+  const fieldsToUpdate = Object.keys(req.body).filter(key => key !== 'id');
+  const setClause = fieldsToUpdate.map(field => `${field} = ?`).join(', ');
 
+  const sql = `UPDATE rides SET ${setClause} WHERE id = ?`;
+  const values = [...fieldsToUpdate.map(field => req.body[field]), id];
+
+  try {
+    const [result] = await pool.promise().query(sql, values);
+    if (result.affectedRows === 0) return res.status(404).json({ message: 'Ride not found' });
+    res.json({ message: 'Ride updated successfully' });
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
+    
 // Delete a ride by ID
 export const deleteRide = async (req, res) => {
     const { id } = req.params;

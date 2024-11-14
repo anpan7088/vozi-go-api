@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
 });
 
 // Serve static files from the 'public' directory
-app.use('/public', express.static('public'));
+app.use('/', express.static('public'));
 
 // Use the routes
 app.use("/auth", authRoutes);
@@ -52,6 +52,9 @@ app.use("/cities", citiesRoutes);
 app.use("/vehicles", vehicleRoutes);
 app.use("/rides", ridesRoutes);
 app.use("/drivers", driversRoutes);
+
+// Serve static files from the 'public' directory
+// app.use(express.static(path.join(__dirname, 'public')));
 
 // Start server on port 8088 or from process.env.PORT
 app.listen(PORT, () => {

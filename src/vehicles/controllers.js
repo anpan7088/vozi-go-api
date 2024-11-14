@@ -15,7 +15,8 @@ const handleQuery = async (res, query, params = [], successStatus = 200, singleR
         if (singleResult && rows.length === 0) {
             return res.status(404).json({ message: 'Resource not found' });
         }
-        res.status(successStatus).json(singleResult ? rows[0] : rows);
+        res.status(successStatus).json(rows);
+        // res.status(successStatus).json(singleResult ? rows[0] : rows); // blesavo za singleResult da ne e niza
     } catch (error) {
         handleError(res, error);
     }
@@ -32,6 +33,13 @@ export const getVehicleById = async (req, res) => {
     const sql = 'SELECT * FROM vehicles WHERE id = ?';
     const id = parseInt(req.params.id);
     await handleQuery(res, sql, [id], 200, true);
+};
+
+// Get vehicles by driver
+export const getVehiclesByDriver = async (req, res) => {
+    const sql = 'SELECT * FROM vehicles WHERE driver = ?';
+    const driver = req.params.driver;
+    await handleQuery(res, sql, [driver], 200, true);
 };
 
 // Create a new vehicle
