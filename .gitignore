@@ -130,3 +130,8 @@ dist
 .pnp.*
 
 yarn.lock
+
+# Public
+public/md-text/
+
+public/svg/

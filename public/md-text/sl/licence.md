@@ -1,21 +1,11 @@
-# Licenca MIT
+### Slovenian (`sl.md`)
 
-## Copyright (c) 2023 TestDriven.io
+MIT Licenca
 
-Dovoljenje je brezplačno podeljeno vsaki osebi, ki pridobi kopijo
-te programske opreme in pripadajočih dokumentacijskih datotek (»programska oprema«), za obravnavo
-v programski opremi brez omejitev, vključno s pravicami brez omejitev
-za uporabo, kopiranje, spreminjanje, združevanje, objavljanje, distribucijo, podlicenciranje in/ali prodajo
-kopije programske opreme in omogočiti osebam, ki jim je programska oprema namenjena
-opremljen za to, pod naslednjimi pogoji:
+Copyright (c) 2023 TestDriven.io
 
-Zgornje obvestilo o avtorskih pravicah in to obvestilo o dovoljenju bosta vključena v vse
-kopije ali znatne dele programske opreme.
+Dovoljeno je brezplačno pridobiti kopijo te programske opreme in dokumentacije ("Programsko opremo"), za uporabo, kopiranje, spreminjanje, združevanje, objavo, distribucijo, podlicenciranje in/ali prodajo kopij Programske opreme ter dovoliti osebam, ki jim je Programska oprema zagotovljena, da to storijo, pod naslednjimi pogoji:
 
-PROGRAMSKA OPREMA JE NA VOLJO "TAKŠNA, KOT JE", BREZ KAKRŠNEGA KOLI JAMSTVA, IZRECNEGA ALI
-NAMENJENO, VKLJUČNO, VENDAR NE OMEJENO NA JAMSTVA ZA PRODAJO,
-PRIMERNOST ZA DOLOČEN NAMEN IN NEKRŠITEV. V NOBENEM PRIMERU NE SME
-AVTORJI ALI IMETNIKI AVTORSKIH PRAVIC SO ODGOVORNI ZA VSE ZAHTEVKE, ŠKODO ALI DRUGE
-ODGOVORNOST, BODISI V POGODBENEM DEJANJU, ODŠKODNEM DEJANJU ALI DRUGAČE, KI IZHAJA IZ:
-IZ ALI V POVEZAVI Z PROGRAMSKO OPREMO ALI UPORABO ALI DRUGIMI POSLI V
-PROGRAMSKA OPREMA.
+Zgornje obvestilo o avtorskih pravicah in to dovoljenje morata biti vključena v vse kopije ali pomembne dele Programske opreme.
+
+PROGRAMSKA OPREMA JE ZAGOTOVLJENA "KOT JE", BREZ KAKRŠNE KOLI JAMSTVA, IZRAZNEGA ALI IMPLICITNEGA, VKLJUČNO Z JAMSTVI O PRODAJNOSTI, PRIMERNOSTI ZA DOLOČEN NAMEN IN NEKRŠITVE. AVTORJI ALI IMETNIKI AVTORSKIH PRAV V NOBENEM PRIMERU NISO ODGOVORNI ZA KAKRŠNO KOLI ZAHTEVO, ŠKODO ALI DRUGO ODGOVORNOST, ALI V TOŽBI, POGODBI ALI DRUGAČE, IZ NASLOVA ALI V POVEZAVI S PROGRAMSKO OPREMO ALI UPORABO ALI DRUGIMI TRANSAKCIJAMI V PROGRAMSKI OPREMI.
