@@ -22,7 +22,7 @@ const corsOptions = {
         'https://vozi-go.sman.cloud', 
         'http://localhost:5173',
         'http://localhost:5174',
-        'http://158.220.121.142:5173',
+        'http://158.220.121.142:5173/',
         'http://158.220.121.142:5174',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

@@ -44,31 +44,73 @@ export const getVehiclesByDriver = async (req, res) => {
 
 // Create a new vehicle
 export const createVehicle = async (req, res) => {
-    const sql = 'INSERT INTO vehicles (driver, seats, make, model, year, color, mileage) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    try {
-        const { driver, seats, make, model, year, color, mileage } = req.body;
-        const [result] = await Pool.query(sql, [driver, seats, make, model, year, color, mileage]);
-        res.status(201).json({ id: result.insertId, driver, seats, make, model, year, color, mileage });
-    } catch (error) {
-        handleError(res, error);
+    const vehicleData = req.body;
+
+    // Validate that the request body is not empty
+    if (!vehicleData || Object.keys(vehicleData).length === 0) {
+        return res.status(400).json({ message: 'No fields provided to create a vehicle' });
+    }
+
+    // Dynamically extract columns and values
+    const columns = Object.keys(vehicleData); // Extract keys as column names
+    const values = Object.values(vehicleData); // Extract values
+    const placeholders = columns.map((_, index) => ` ?`).join(', '); // Create placeholders dynamically
+
+    // Construct the query dynamically
+    const sql = `INSERT INTO vehicles (${columns.join(', ')}) VALUES (${placeholders})`;
+
+    // console.log('Insert Query:', insertQuery);
+    // console.log('Values:', values);
+    try { 
+        await Pool.query(sql, values);
+        res.json({
+            status: true,
+            message: 'Vehicle data inserted successfully',
+            values: values,
+        });
+    } catch (err) {
+        console.error("Error in SQL query:", err);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+        });
     }
 };
 
 // Update a vehicle by ID
-export const updateVehicle = async (req, res) => {
-    const sql = 'UPDATE vehicles SET driver = ?, seats = ?, make = ?, model = ?, year = ?, color = ?, mileage = ? WHERE id = ?';
-    const id = parseInt(req.params.id);
+export const patchVehicle = async (req, res) => {
+    const vehicle_id = parseInt(req.params.id);
+    const fieldsToUpdate = req.body;
+
+    // Empty list to store the fields to update
+    let updateFields = [];
+    let updateValues = [];
+
+    // Loop through the fields to update and build the SQL query
+    for (const field in fieldsToUpdate) {
+        updateFields.push(`${field} = ?`);
+        updateValues.push(fieldsToUpdate[field]);
+    }
+    if (updateFields.length === 0) {
+        return res.status(400).json({ error: 'No fields to update' });
+    }
+    updateValues.push(vehicle_id);
+    // Construct the SQL query from the list of fields to update
+    const sql = `UPDATE vehicles SET ${updateFields.join(", ")} WHERE id = ?`;
+    // Execute the SQL query
     try {
-        const { driver, seats, make, model, year, color, mileage } = req.body;
-        const [result] = await Pool.query(sql, [driver, seats, make, model, year, color, mileage, id]);
-        
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Vehicle not found' });
-        }
-        
-        res.status(200).send(`Vehicle modified with ID: ${id}`);
-    } catch (error) {
-        handleError(res, error);
+        await Pool.query(sql, updateValues);
+        res.json({
+            status: true,
+            message: 'Vehicle data updated successfully',
+            values: fieldsToUpdate,
+        });
+    } catch (err) {
+        console.error("Error in SQL query:", err);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+        });
     }
 };
 
