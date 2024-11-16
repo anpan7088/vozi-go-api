@@ -1,106 +1,21 @@
-<a href="https://marked.js.org">
-  <img width="60px" height="60px" src="https://marked.js.org/img/logo-black.svg" align="right" />
-</a>
+# МИТ Лиценца
 
-# Marked
+## Авторски права (c) 2024 ВозиGo
 
-[![npm](https://badgen.net/npm/v/marked)](https://www.npmjs.com/package/marked)
-[![install size](https://badgen.net/packagephobia/install/marked)](https://packagephobia.now.sh/result?p=marked)
-[![downloads](https://badgen.net/npm/dt/marked)](https://www.npmjs.com/package/marked)
-[![github actions](https://github.com/markedjs/marked/workflows/Tests/badge.svg)](https://github.com/markedjs/marked/actions)
-[![snyk](https://snyk.io/test/npm/marked/badge.svg)](https://snyk.io/test/npm/marked)
+Дозвола се дава, бесплатно, на кое било лице што ќе добие копија
+на овој софтвер и придружните датотеки за документација (во натамошниот текст "Софтвер"), да работи
+со Софтверот без ограничувања, вклучувајќи без ограничување правата за
+користење, копирање, менување, спојување, објавување, дистрибуирање, подлиценцирање и/или продавање
+копии од Софтверот, и да дозволи на лица на кои им е даден
+Софтверот се доставува со под условите:
 
-- ⚡ built for speed
-- ⬇️ low-level compiler for parsing markdown without caching or blocking for long periods of time
-- ⚖️ light-weight while implementing all markdown features from the supported flavors & specifications
-- 🌐 works in a browser, on a server, or from a command line interface (CLI)
+Напомена за авторските права и оваа дозвола мора да бидат вклучени во сите
+копии или значајни делови од Софтверот.
 
-## Demo
-
-Checkout the [demo page](https://marked.js.org/demo/) to see marked in action ⛹️
-
-## Docs
-
-Our [documentation pages](https://marked.js.org) are also rendered using marked 💯
-
-Also read about:
-
-* [Options](https://marked.js.org/using_advanced)
-* [Extensibility](https://marked.js.org/using_pro)
-
-## Compatibility
-
-**Node.js:** Only [current and LTS](https://nodejs.org/en/about/releases/) Node.js versions are supported. End of life Node.js versions may become incompatible with Marked at any point in time.
-
-**Browser:** Not IE11 :)
-
-## Installation
-
-**CLI:**
-
-```sh
-npm install -g marked
-```
-
-**In-browser:**
-
-```sh
-npm install marked
-```
-
-## Usage
-
-### Warning: 🚨 Marked does not [sanitize](https://marked.js.org/using_advanced#options) the output HTML. Please use a sanitize library, like [DOMPurify](https://github.com/cure53/DOMPurify) (recommended), [sanitize-html](https://github.com/apostrophecms/sanitize-html) or [insane](https://github.com/bevacqua/insane) on the *output* HTML! 🚨
-
-```
-DOMPurify.sanitize(marked.parse(`<img src="x" onerror="alert('not happening')">`));
-```
-
-**CLI**
-
-``` bash
-# Example with stdin input
-$ marked -o hello.html
-hello world
-^D
-$ cat hello.html
-<p>hello world</p>
-```
-
-```bash
-# Print all options
-$ marked --help
-```
-
-**Browser**
-
-```html
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8"/>
-  <title>Marked in the browser</title>
-</head>
-<body>
-  <div id="content"></div>
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script>
-    document.getElementById('content').innerHTML =
-      marked.parse('# Marked in the browser\n\nRendered by **marked**.');
-  </script>
-</body>
-</html>
-```
-or import esm module
-
-```html
-<script type="module">
-  import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
-  document.getElementById('content').innerHTML =
-    marked.parse('# Marked in the browser\n\nRendered by **marked**.');
-</script>
-```
-
-## License
-
-Copyright (c) 2011-2022, Christopher Jeffrey. (MIT License)
+СОФТВЕРОТ СЕ ДОСТАВУВА "КАКО ШТО Е", БЕЗ ГАРАНЦИЈА ОД КАКОВ БИЛО ВИД,
+ИЗРИЧЕН ИЛИ ИМПЛИЦИРАН, ВКЛУЧУВАЈЌИ НО НЕ ОГРАНИЧУВАЈЌИ СЕ НА ГАРАНЦИИ ЗА ПРОДАЖБА,
+ПРИЛАГОДЕНОСТ ЗА ОДРЕДЕНА ЦЕЛ И НЕПРЕКРШУВАЊЕ. НИ ПОД КОИ УСЛОВИ
+АВТОРИТЕ ИЛИ НОСИТЕЛИТЕ НА АВТОРСКИТЕ ПРАВА НЕМА ДА БИДАТ ОДГОВОРНИ ЗА БИЛО КАКВА ПОБАРУВАЊЕ, ШТЕТИ ИЛИ
+ДРУГИ ОДГОВОРНОСТИ, БЕЗ РАЗЛИКА ДАЛИ СО ДОГОВОР, ДЕЛИКТ ИЛИ ИНАЧЕ,
+КОИ ПРОИЗЛЕГУВААТ ОД, НАДВОР ОД ИЛИ ВО ВРСКА СО СОФТВЕРОТ ИЛИ УПОТРЕБАТА ИЛИ ДРУГИ РАБОТЕЊА ВО
+СОФТВЕРОТ.

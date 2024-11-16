@@ -2,7 +2,7 @@
 
 Licenca MIT
 
-E drejta e autorit (c) 2024 VoziGO
+E drejta e autorit (c) 2024 ВозиGo
 
 Lejohet që çdo person që merr një kopje të këtij programi dhe dokumentacionit përkatës ("Programi"), të përdorë, kopjojë, modifikojë, bashkojë, publikojë, shpërndajë, nënlicencojë dhe/ose shesë kopje të Programit, si dhe t’u lejojë personave të tjerë të cilëve u është dhënë Programi, të veprojnë njësoj, me kusht që kushtet e mëposhtme të respektohen:
 

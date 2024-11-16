@@ -1,6 +1,6 @@
 # MIT-Lizenz
 
-## Copyright (c) 2023 TestDriven.io
+## Copyright (c) 2024 ВозиGo
 
 Hiermit wird jeder Person, die eine Kopie dieser Software und der zugehörigen Dokumentationsdateien (die "Software") erhält, kostenlos die Erlaubnis erteilt, uneingeschränkt mit der Software zu handeln, einschließlich der uneingeschränkten Rechte zur Nutzung, Kopie, Modifikation, Zusammenführung, Veröffentlichung, Verteilung, Unterlizenzierung und/oder zum Verkauf von Kopien der Software, und Personen, denen diese Software bereitgestellt wird, diese Rechte zu gestatten, unter den folgenden Bedingungen:
 

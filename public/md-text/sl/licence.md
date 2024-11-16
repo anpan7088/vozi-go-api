@@ -1,8 +1,8 @@
-### Slovenian (`sl.md`)
 
-MIT Licenca
 
-Copyright (c) 2023 TestDriven.io
+# MIT Licenca
+
+### Copyright (c) 2024 ВозиGo
 
 Dovoljeno je brezplačno pridobiti kopijo te programske opreme in dokumentacije ("Programsko opremo"), za uporabo, kopiranje, spreminjanje, združevanje, objavo, distribucijo, podlicenciranje in/ali prodajo kopij Programske opreme ter dovoliti osebam, ki jim je Programska oprema zagotovljena, da to storijo, pod naslednjimi pogoji:
 

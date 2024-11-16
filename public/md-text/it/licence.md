@@ -1,6 +1,6 @@
 # Licenza MIT
 
-## Copyright (c) 2024 VoziGo
+## Copyright (c) 2024 ВозиGo
 
 Con la presente si concede gratuitamente, a chiunque ottenga una copia
 di questo software e dei relativi file di documentazione (il "Software"), il permesso di utilizzare

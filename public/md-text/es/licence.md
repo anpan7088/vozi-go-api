@@ -1,6 +1,6 @@
 # Licencia MIT
 
-## Derechos de autor (c) 2024 VoziGo
+## Derechos de autor (c) 2024 ВозиGo
 
 Por la presente se concede permiso, sin cargo, a cualquier persona que obtenga una copia
 del software y los archivos de documentación asociados (el "Software"), para tratar

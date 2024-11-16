@@ -1,6 +1,6 @@
 # MIT Licenca
 
-## Autorska prava (c) 2024 VoziGO
+## Autorska prava (c) 2024 ВозиGo
 
 Ovim se bez naknade dopušta svakoj osobi koja pribavi primjerak ovog softvera i pratećih dokumentacijskih datoteka (u daljnjem tekstu "Softver") postupanje sa Softverom bez ograničenja, uključujući bez ograničenja prava na korištenje, kopiranje, izmjenu, spajanje, objavljivanje, distribuciju, podlicenciranje i/ili prodaju kopija Softvera, te dopuštanje osobama kojima je Softver isporučen to činiti, uz pridržavanje sljedećih uvjeta:
 
