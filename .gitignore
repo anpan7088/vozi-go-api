@@ -132,6 +132,7 @@ dist
 yarn.lock
 
 # Public
-public/md-text/
+public
+public/md-text
 
-public/svg/
+public/svg

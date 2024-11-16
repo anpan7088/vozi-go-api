@@ -102,7 +102,7 @@ export const getDestList = async (req, res) => {
 // Get all rides with filters
 export const getRides = async (req, res) => {
     // const { search, sort, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1 } = req.query;
-    const { search, sort, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1, before, after, beforeTimestamp, afterTimestamp } = req.query;
+    const { search, sort, userID, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1, before, after, beforeTimestamp, afterTimestamp } = req.query;
     // Initialize conditions array and parameters array for SQL
     let conditions = [];
     let params = [];
@@ -111,6 +111,11 @@ export const getRides = async (req, res) => {
     if (departMesta) {
         conditions.push(`depart_mesta.city = ?`);
         params.push(departMesta);
+    }
+    // filter by userID (driver)
+    if (userID) {
+        conditions.push(`users.id = ?`);
+        params.push(userID);
     }
 
     if (destMesta) {
@@ -203,7 +208,7 @@ export const getRides = async (req, res) => {
             limit: limitValue,
             totalResults: totalRides,
             totalPages: totalPages,
-            rides: ridesResult
+            data: ridesResult
         });
     } catch (err) {
         res.status(500).send(err);
