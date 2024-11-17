@@ -220,7 +220,7 @@ export const getRides = async (req, res) => {
 // Get a ride by ID
 export const getRideById = async (req, res) => {
     const { id } = req.params;
-    const sql = masterQuery;
+    const sql = masterQuery + " WHERE rides.id = ?";
     try {
         const [result] = await pool.promise().query(sql, [id]);
         if (result.length === 0) return res.status(404).json({ message: 'Ride not found' });
