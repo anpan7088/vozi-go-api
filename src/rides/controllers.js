@@ -260,7 +260,7 @@ export const createRide = async (req, res) => {
         res.status(500).send(err);
     }
 };
-
+ 
 export const patchRide = async (req, res) => {
     const { id } = req.params;
 
@@ -298,7 +298,7 @@ export default {
     getRides,
     getRideById,
     createRide,
-    updateRide,
+    patchRide,
     deleteRide,
     getDepartList,
     getDestList

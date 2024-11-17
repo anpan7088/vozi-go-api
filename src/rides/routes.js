@@ -3,7 +3,7 @@ import {
     getRides, 
     getRideById, 
     createRide, 
-    updateRide, 
+    patchRide, 
     deleteRide, 
     getDepartList,
     getDestList,
