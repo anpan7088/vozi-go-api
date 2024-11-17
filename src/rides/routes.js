@@ -19,7 +19,7 @@ router.get('/departList', getDepartList);
 router.get('/destList', getDestList);
 router.get('/:id', getRideById);
 router.post('/', createRide);
-router.patch('/:id', updateRide);
+router.patch('/:id', patchRide);
 router.delete('/:id', deleteRide);
 
 export default router;

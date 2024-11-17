@@ -249,37 +249,37 @@ export const createRide = async (req, res) => {
     const fields = Object.keys(req.body);
     const placeholders = fields.map(() => '?').join(',');
     const sql = `INSERT INTO rides (${fields.join(', ')}) VALUES (${placeholders})`;
-  
+
     // Prepare the values for the SQL query
     const values = fields.map((field) => req.body[field]);
-  
+
     try {
-      const [result] = await pool.promise().query(sql, values);
-      res.status(201).json({ id: result.insertId, ...req.body });
+        const [result] = await pool.promise().query(sql, values);
+        res.status(201).json({ id: result.insertId, ...req.body });
     } catch (err) {
-      res.status(500).send(err);
+        res.status(500).send(err);
     }
-  };
-
-export const updateRide = async (req, res) => {
-  const { id } = req.params;
-  
-  // Extract fields that have changed
-  const fieldsToUpdate = Object.keys(req.body).filter(key => key !== 'id');
-  const setClause = fieldsToUpdate.map(field => `${field} = ?`).join(', ');
-
-  const sql = `UPDATE rides SET ${setClause} WHERE id = ?`;
-  const values = [...fieldsToUpdate.map(field => req.body[field]), id];
-
-  try {
-    const [result] = await pool.promise().query(sql, values);
-    if (result.affectedRows === 0) return res.status(404).json({ message: 'Ride not found' });
-    res.json({ message: 'Ride updated successfully' });
-  } catch (err) {
-    res.status(500).send(err);
-  }
 };
-    
+
+export const patchRide = async (req, res) => {
+    const { id } = req.params;
+
+    // Extract fields that have changed
+    const fieldsToUpdate = Object.keys(req.body).filter(key => key !== 'id');
+    const setClause = fieldsToUpdate.map(field => `${field} = ?`).join(', ');
+
+    const sql = `UPDATE rides SET ${setClause} WHERE id = ?`;
+    const values = [...fieldsToUpdate.map(field => req.body[field]), id];
+
+    try {
+        const [result] = await pool.promise().query(sql, values);
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'Ride not found' });
+        res.json({ message: 'Ride updated successfully' });
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
 // Delete a ride by ID
 export const deleteRide = async (req, res) => {
     const { id } = req.params;
