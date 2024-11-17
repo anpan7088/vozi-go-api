@@ -7,11 +7,14 @@ import {
     deleteRide, 
     getDepartList,
     getDestList,
+    getRidesByUserId
 } from './controllers.js';
 
 const router = Router();
 
 router.get('/', getRides);
+router.get('/user/:id', getRidesByUserId);
+router.get('/driver/:id', getRidesByUserId);
 router.get('/departList', getDepartList);
 router.get('/destList', getDestList);
 router.get('/:id', getRideById);

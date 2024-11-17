@@ -4,7 +4,7 @@ import { pool } from '../db/db.mjs';
 const masterQuery = `
     SELECT 
         rides.id AS rideID,
-        rides.start_time,
+        DATE_FORMAT(rides.start_time, '%Y-%m-%dT%H:%i') start_time,
         DATE_FORMAT(rides.start_time, '%Y-%m-%d') AS depart_date,
         DATE_FORMAT(rides.start_time, '%H:%i') AS depart_time,
         depart_mesta.city as depart,
@@ -13,15 +13,17 @@ const masterQuery = `
         dest_mesta.city as dest,
         dest_mesta.country_id as dest_country_id,
         dest_mesta.id as dest_mesta_id,
-        users.id userID,
+        users.id as userID,
         users.username username,
         users.firstName,
         users.lastName,
         vehicles.make,
         vehicles.model,
-        vehicles.seats,
+        vehicles.seats as vehicle_seats,
         vehicles.color,
         vehicles.license_plate,
+        rides.price,
+        rides.seats as seats_left,
         CASE WHEN rides.start_time < NOW() THEN true ELSE false END AS expired
     FROM rides
     INNER JOIN mesta AS depart_mesta ON depart_mesta.id=rides.depart
@@ -218,11 +220,23 @@ export const getRides = async (req, res) => {
 // Get a ride by ID
 export const getRideById = async (req, res) => {
     const { id } = req.params;
-    const sql = rideDetailQuery;
+    const sql = masterQuery;
     try {
         const [result] = await pool.promise().query(sql, [id]);
         if (result.length === 0) return res.status(404).json({ message: 'Ride not found' });
         res.json(result[0]);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
+// Get a rides by User ID
+export const getRidesByUserId = async (req, res) => {
+    const { id } = req.params;
+    const sql = masterQuery + " WHERE users.id  = ?";
+    try {
+        const [result] = await pool.promise().query(sql, [id]);
+        res.json(result);
     } catch (err) {
         res.status(500).send(err);
     }
