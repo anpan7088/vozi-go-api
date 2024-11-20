@@ -42,6 +42,13 @@ export const getVehiclesByDriver = async (req, res) => {
     await handleQuery(res, sql, [driver], 200, true);
 };
 
+// Check exitance of the license plate
+export const checkLicensePlate = async (req, res) => {
+    const sql = 'SELECT * FROM vehicles WHERE license_plate = ?';
+    const licensePlate = req.params.licensePlate;
+    await handleQuery(res, sql, [licensePlate], 200, true);
+};
+
 // Create a new vehicle
 export const createVehicle = async (req, res) => {
     const vehicleData = req.body;
@@ -65,6 +72,7 @@ export const createVehicle = async (req, res) => {
         await Pool.query(sql, values);
         res.json({
             status: true,
+            msgKey: 'VehicleDataInsertedSuccessfully',
             message: 'Vehicle data inserted successfully',
             values: values,
         });
@@ -72,7 +80,7 @@ export const createVehicle = async (req, res) => {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
-            sqlError: err.sqlMessage,
+            sqlError: err.sqlMessage
         });
     }
 };
@@ -102,17 +110,26 @@ export const patchVehicle = async (req, res) => {
         await Pool.query(sql, updateValues);
         res.json({
             status: true,
+            msgKey: 'VehicleDataUpdatedSuccessfully',
             message: 'Vehicle data updated successfully',
             values: fieldsToUpdate,
         });
-    } catch (err) {
-        console.error("Error in SQL query:", err);
-        res.status(500).json({
-            error: 'Internal Server Error',
-            sqlError: err.sqlMessage,
-        });
-    }
+    } catch (error) {
+        if (error.code === 'ER_DUP_ENTRY') { 
+            res.status(409).json({ 
+                message: 'Duplicate entry, vehicle already exists',
+                msgKey: 'DuplicateEntry',
+                error
+            }); 
+        } else { 
+            res.status(500).json({ 
+                message: 'Internal server error!',
+                msgKey: 'InternalServerError',
+                error
+            }); }
+    } 
 };
+
 
 // Delete a vehicle by ID
 export const deleteVehicle = async (req, res) => {
@@ -122,10 +139,19 @@ export const deleteVehicle = async (req, res) => {
         const [result] = await Pool.query(sql, [id]);
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Vehicle not found' });
+            return res.status(404).json({ 
+                msgKey: 'VehicleNotFound',
+                message: 'Vehicle not found',
+                vehicle_id: id
+            });
         }
 
-        res.status(200).send(`Vehicle deleted with ID: ${id}`);
+        res.json({
+            msgKey: 'VehicleDeletedSuccessfully',
+            message: 'Vehicle deleted successfully',
+            affectedRows: result.affectedRows,
+            vehicle_id: id
+        });
     } catch (error) {
         handleError(res, error);
     }
