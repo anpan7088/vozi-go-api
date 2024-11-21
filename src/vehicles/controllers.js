@@ -68,7 +68,7 @@ export const createVehicle = async (req, res) => {
 
     // console.log('Insert Query:', insertQuery);
     // console.log('Values:', values);
-    try { 
+    try {
         await Pool.query(sql, values);
         res.json({
             status: true,
@@ -115,19 +115,20 @@ export const patchVehicle = async (req, res) => {
             values: fieldsToUpdate,
         });
     } catch (error) {
-        if (error.code === 'ER_DUP_ENTRY') { 
-            res.status(409).json({ 
+        if (error.code === 'ER_DUP_ENTRY') {
+            res.status(409).json({
                 message: 'Duplicate entry, vehicle already exists',
                 msgKey: 'DuplicateEntry',
                 error
-            }); 
-        } else { 
-            res.status(500).json({ 
+            });
+        } else {
+            res.status(500).json({
                 message: 'Internal server error!',
                 msgKey: 'InternalServerError',
                 error
-            }); }
-    } 
+            });
+        }
+    }
 };
 
 
@@ -139,7 +140,7 @@ export const deleteVehicle = async (req, res) => {
         const [result] = await Pool.query(sql, [id]);
 
         if (result.affectedRows === 0) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 msgKey: 'VehicleNotFound',
                 message: 'Vehicle not found',
                 vehicle_id: id
@@ -153,6 +154,18 @@ export const deleteVehicle = async (req, res) => {
             vehicle_id: id
         });
     } catch (error) {
-        handleError(res, error);
+        if (error.code === 'ER_ROW_IS_REFERENCED_2') {
+            res.status(409).json({
+                message: error.message,
+                msgKey: 'ForeignKeyConstraintFailed',
+                error
+            });
+        } else {
+            res.status(500).json({
+                message: 'Internal server error!',
+                msgKey: 'InternalServerError',
+                error
+            });
+        }
     }
 };
