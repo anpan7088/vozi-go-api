@@ -11,6 +11,7 @@ import vehicleRoutes from './vehicles/routes.js';  // Adjusted for ES Modules
 import ridesRoutes from './rides/routes.js';  // Adjusted for ES Modules
 import driversRoutes from './drivers/routes.js';  // Adjusted for ES Modules
 import rolesRoutes from './roles/routes.js';  // Adjusted for ES Modules
+import healthRoutes from './health/routes.js';  // Adjusted for ES Modules
 
 const PORT = process.env.PORT || 8088;
 
@@ -43,6 +44,8 @@ app.get("/", (req, res) => {
 
 // Serve static files from the 'public' directory
 app.use('/', express.static('public'));
+// Serve static files from the 'public' directory
+// app.use(express.static(path.join(__dirname, 'public')));
 
 // Use the routes
 app.use("/auth", authRoutes);
@@ -52,9 +55,10 @@ app.use("/cities", citiesRoutes);
 app.use("/vehicles", vehicleRoutes);
 app.use("/rides", ridesRoutes);
 app.use("/drivers", driversRoutes);
+// Health check endpoint
+app.use('/health', healthRoutes);
 
-// Serve static files from the 'public' directory
-// app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Start server on port 8088 or from process.env.PORT
 app.listen(PORT, () => {
