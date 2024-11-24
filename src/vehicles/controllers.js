@@ -15,7 +15,7 @@ SELECT
     vehicles.year,
     COUNT(rides.id) as rides
 FROM vehicles 
-INNER JOIN rides on rides.vehicle_id = vehicles.id
+LEFT JOIN rides on rides.vehicle_id = vehicles.id
 ${whereClause}
 GROUP BY vehicles.id
 `;
@@ -124,6 +124,7 @@ export const patchVehicle = async (req, res) => {
     updateValues.push(vehicle_id);
     // Construct the SQL query from the list of fields to update
     const sql = `UPDATE vehicles SET ${updateFields.join(", ")} WHERE id = ?`;
+    console.log(sql);
     // Execute the SQL query
     try {
         await Pool.query(sql, updateValues);
