@@ -9,14 +9,15 @@ const expiration = Number(process.env.JWT_EXPIRATION) || 3600;
 
 const responseTokenGenerator = (result) => {
     const { id, username, fullName, role } = result; // Decompose the result object
-
+    const user_id = id;
     // Create a payload object with the user's ID, username, and role
-    const payload = { id, username, role };
+    const payload = { user_id, username, role };
     const token = sign(payload, secretKey, { expiresIn: expiration });
 
     return { 
         message: 'JWT Token Generated Successfully', 
-        id, 
+        id: user_id,
+        user_id,
         userName: username, 
         fullName, 
         role, 

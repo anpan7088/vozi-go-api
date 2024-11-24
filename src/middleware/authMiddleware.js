@@ -23,18 +23,31 @@ export const isUser = (req, res, next) => {
 };
 
 // isOwner middleware, assuming user_id is stored in the token payload
-export const isOwner = async (req, res, next) => {
-    const reviewToDel = req.params.id;
+export const isProfileOwner = async (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1]; // Extract the token from the Authorization header
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized: No token provided' });
+    }
     try {
-        const [result] = await pool.promise().query('SELECT user_id FROM dorms_review WHERE id = ?', [reviewToDel]);
-        if (result.length > 0 && result[0].user_id === req.user.id) {
-            next();
-        } else {
-            res.status(403).json({ error: 'Forbidden: You are not the owner of this review' });
+        // Verify and decode the token
+        const decoded = jwt.verify(token, secretKey); // Use your secret key from environment variables
+        const userIdFromToken = decoded.user_id; // Assume the token payload includes the user ID as 'id'
+        const userIdFromRequest = Number(req.params.user_id); // || req.body.user_id; // User ID from request (e.g., from URL or body)
+
+        if (!userIdFromRequest) {
+            return res.status(400).json({ error: 'Bad Request: No user_id provided' });
         }
-    } catch (err) {
-        console.error("Error in SQL query:", err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        if (userIdFromToken === userIdFromRequest) {
+            return next(); // User is authorized, proceed to the next middleware/controller
+        }
+        return res.status(403).json({ error: 'Forbidden: You do not own this profile' });
+
+    } catch (error) {
+        console.error("Error in isProfileOwner middleware:", error);
+        res.status(401).json({
+            error: 'Unauthorized: Invalid token',
+            details: error.message
+        });
     }
 };
 
@@ -51,7 +64,7 @@ export const isAdmin = (req, res, next) => {
         console.log('Decoded token:', decoded);
         req.user = decoded; // Assuming the token payload contains the user object with username and role
 
-        if (req.user && req.user.role === 'admin') {
+        if (req.user && ( req.user.role === 'admin' || req.user.role === 'root' )) {
             next();
         } else {
             res.status(403).json({ error: 'Forbidden: Admins only' });
@@ -65,7 +78,6 @@ export const isAdmin = (req, res, next) => {
 // isAdminOrOwner middleware, assuming admin role is 'admin' and role is stored in the token payload
 export const isAdminOrOwner = async (req, res, next) => {
     const token = req.header('Authorization');
-
     if (!token) {
         return res.status(401).json({ error: 'Unauthorized: No token provided' });
     }
