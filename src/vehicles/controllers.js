@@ -2,6 +2,24 @@ import { pool } from '../db/db.mjs';
 
 const Pool = pool.promise();
 
+// Define the main query
+const mainQuery = (whereClause='') => `
+SELECT 
+	vehicles.id, 
+    vehicles.license_plate, 
+    vehicles.driver,
+    vehicles.seats,
+    vehicles.model,
+    vehicles.color,
+    vehicles.make,
+    vehicles.year,
+    COUNT(rides.id) as rides
+FROM vehicles 
+INNER JOIN rides on rides.vehicle_id = vehicles.id
+${whereClause}
+GROUP BY vehicles.id
+`;
+
 // Centralized error handler
 const handleError = (res, error) => {
     console.error(error);
@@ -24,27 +42,28 @@ const handleQuery = async (res, query, params = [], successStatus = 200, singleR
 
 // Get all vehicles
 export const getVehicles = async (req, res) => {
-    const sql = 'SELECT * FROM vehicles';
+    const sql = mainQuery();
     await handleQuery(res, sql);
 };
 
 // Get vehicle by ID
 export const getVehicleById = async (req, res) => {
-    const sql = 'SELECT * FROM vehicles WHERE id = ?';
+    const sql = mainQuery('WHERE vehicles.id = ?');
     const id = parseInt(req.params.id);
+    console.log(id);
     await handleQuery(res, sql, [id], 200, true);
 };
 
 // Get vehicles by driver
 export const getVehiclesByDriver = async (req, res) => {
-    const sql = 'SELECT * FROM vehicles WHERE driver = ?';
+    const sql = mainQuery('WHERE vehicles.driver = ?');
     const driver = req.params.driver;
     await handleQuery(res, sql, [driver], 200, true);
 };
 
 // Check exitance of the license plate
 export const checkLicensePlate = async (req, res) => {
-    const sql = 'SELECT * FROM vehicles WHERE license_plate = ?';
+    const sql = mainQuery('WHERE vehicles.license_plate = ?');
     const licensePlate = req.params.licensePlate;
     await handleQuery(res, sql, [licensePlate], 200, true);
 };
