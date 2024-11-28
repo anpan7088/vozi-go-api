@@ -5,11 +5,6 @@ import bcrypt from 'bcrypt'; // Import bcrypt for password hashing
 // import nodemailer from 'nodemailer'; // For sending emails
 import Mailjet from 'node-mailjet';
 
-const mailjetClient = Mailjet.apiConnect(
-    'c4266a882d0a75b0cd65cb6769f7cad4', // API Key
-    'c1701974b2b0e78e90ada7ace47e5b3c'  // Secret Key
-);
-
 import crypto from 'crypto';
 
 import { pool } from '../db/db.mjs'; // Adjust the path to the db module
@@ -21,6 +16,8 @@ const appBaseUrl = process.env.APP_BASE_URL || 'http://localhost:3000'; // Adjus
 
 const resetTable = process.env.RESET_TABLE || 'password_resets';
 const resetTokenExpiration = Number(process.env.RESET_TOKEN_EXPIRATION) || 3600; // 1 hour
+
+const mailjetClient = Mailjet.apiConnect(  process.env.API_KEY,  process.env.API_SECRET);
 
 const saltRounds = 10; // Define the number of salt rounds for bcrypt
 
@@ -235,8 +232,7 @@ export const sendPasswordResetLink = async (req, res) => {
         // Create a password reset link
         const resetLink = `${appBaseUrl}/reset-password?token=${resetToken}&userId=${userId}`;
 
-        console.log(resetLink);
-
+        // Sending mail
         sendMail(username, email, resetLink);
 
         res.status(200).json({ message: 'Password reset link sent successfully' });

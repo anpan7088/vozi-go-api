@@ -1,3 +1,4 @@
+// script for encripting paasswords
 import bcrypt from 'bcrypt';
 import { pool } from '../db/db.mjs'; // Adjust the path to your db connection
 
