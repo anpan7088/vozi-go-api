@@ -54,7 +54,7 @@ export const patchUserProfile = async (req, res) => {
     // Get user_id from query parameters if present, otherwise use req.user.id
     const userId = req.params.user_id || req.user.id;
     const fieldsToUpdate = req.body;
-
+console.log(fieldsToUpdate);
     // Empty list to store the fields to update
     let updateFields = [];
     let updateValues = [];
