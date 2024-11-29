@@ -235,7 +235,12 @@ export const sendPasswordResetLink = async (req, res) => {
         // Sending mail
         sendMail(username, email, resetLink);
 
-        res.status(200).json({ message: 'Password reset link sent successfully' });
+        res.status(200).json(
+            { 
+                username: username,
+                message: 'Password reset link sent successfully',
+                email: email
+            });
     } catch (err) {
         console.error('Error sending password reset link:', err);
         res.status(500).json({ error: 'Internal Server Error' });
