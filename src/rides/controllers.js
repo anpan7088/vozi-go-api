@@ -48,16 +48,26 @@ const departListQuery = `
     INNER JOIN mesta on mesta.id=rides.depart
 `;
 
+const departTextListQuery = `
+    SELECT distinct(depart_text) FROM rides 
+    `;
+
 const destListQuery = `
     SELECT distinct(destination) as id, mesta.city FROM rides
     INNER JOIN mesta on mesta.id=rides.destination
-`;
+    `;
+
+const destTextListQuery = `
+    SELECT distinct(dest_text) FROM rides
+    `;
 
 const rideDetailQuery = `
 SELECT 
 	rides.id, 
     depart.city as depart,
     dest.city as dest,
+    depart_text,
+    dest_text,
     rides.start_time as start_time,
     DATE_FORMAT(rides.start_time, '%Y-%m-%d') AS depart_date,
     DATE_FORMAT(rides.start_time, '%H:%i') AS depart_time,
@@ -93,6 +103,16 @@ export const getDepartList = async (req, res) => {
     }
 };
 
+// Get by Text Depart list
+export const getDepartTextList = async (req, res) => {
+    try {
+        const [departTextList] = await pool.promise().query(departTextListQuery);
+        res.json(departTextList);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
 // Get Dest list
 export const getDestList = async (req, res) => {
     try {
@@ -103,10 +123,37 @@ export const getDestList = async (req, res) => {
     }
 };
 
+// Get by Text Dest list
+export const getDestTextList = async (req, res) => {
+    try {
+        const [destTextList] = await pool.promise().query(destTextListQuery);
+        res.json(destTextList);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+};
+
 // Get all rides with filters
 export const getRides = async (req, res) => {
     // const { search, sort, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1 } = req.query;
-    const { search, sort, userID, departMesta, destMesta, voziloFilter, licensePlate, departMestaId, destMestaId, limit = 10, page = 1, before, after, beforeTimestamp, afterTimestamp } = req.query;
+    const {
+        search,
+        sort,
+        userID,
+        departMesta,
+        destMesta,
+        voziloFilter,
+        licensePlate,
+        departMestaId,
+        departMestaText,
+        destMestaId,
+        destMestaText,
+        limit = 10, 
+        page = 1,
+        before, after,
+        beforeTimestamp, afterTimestamp
+    } = req.query;
+
     // Initialize conditions array and parameters array for SQL
     let conditions = [];
     let params = [];
@@ -137,9 +184,19 @@ export const getRides = async (req, res) => {
         params.push(departMestaId);
     }
 
+    if (departMestaText) {
+        conditions.push(`depart_text = ?`);
+        params.push(departMestaText);
+    }
+
     if (destMestaId) {
         conditions.push(`dest_mesta.id = ?`);
         params.push(destMestaId);
+    }
+
+    if (destMestaText) {
+        conditions.push(`dest_text = ?`);
+        params.push(destMestaText);
     }
 
     if (licensePlate) {
@@ -260,7 +317,7 @@ export const createRide = async (req, res) => {
         res.status(500).send(err);
     }
 };
- 
+
 export const patchRide = async (req, res) => {
     const { id } = req.params;
 

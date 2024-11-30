@@ -7,6 +7,6 @@ router.post("/register", registerUser);
 router.post('/login', loginUser);
 router.post('/passwordchange', passwordChange);
 router.post('/password_reset_link', sendPasswordResetLink);
-router.post('/password_reset', resetPassword);
+router.post('/set_new_password', resetPassword);
 
 export default router;

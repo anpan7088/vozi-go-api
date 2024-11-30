@@ -12,12 +12,12 @@ import { pool } from '../db/db.mjs'; // Adjust the path to the db module
 const usersTable = process.env.USERS_TABLE || 'users';
 const secretKey = process.env.JWT_SECRET_KEY || 'defaultSecretKey-eohfufiufrei';
 const expiration = Number(process.env.JWT_EXPIRATION) || 3600;
-const appBaseUrl = process.env.APP_BASE_URL || 'http://localhost:3000'; // Adjust the base URL of your app
+const BaseUrl = process.env.BASE_URL || 'http://localhost:3000'; // Adjust the base URL of your app
 
 const resetTable = process.env.RESET_TABLE || 'password_resets';
 const resetTokenExpiration = Number(process.env.RESET_TOKEN_EXPIRATION) || 3600; // 1 hour
 
-const mailjetClient = Mailjet.apiConnect(  process.env.API_KEY,  process.env.API_SECRET);
+const mailjetClient = Mailjet.apiConnect(process.env.API_KEY, process.env.API_SECRET);
 
 const saltRounds = 10; // Define the number of salt rounds for bcrypt
 
@@ -147,7 +147,7 @@ export const resetPassword = async (req, res) => {
         const [tokens] = await pool.promise().query(sqlFetchToken, [hashedToken, userId]);
 
         if (tokens.length === 0) {
-            return res.status(400).json({ error: 'Invalid or expired token' });
+            return res.status(400).json({ error: 'InvalidOrExpiredToken' });
         }
 
         // Hash the new password
@@ -161,14 +161,18 @@ export const resetPassword = async (req, res) => {
         const sqlDeleteToken = `DELETE FROM ${resetTable} WHERE token = ?`;
         await pool.promise().query(sqlDeleteToken, [hashedToken]);
 
-        res.status(200).json({ message: 'Password reset successfully' });
+        res.status(200).json({ message: 'PasswordResetSuccessfully' });
     } catch (err) {
         console.error('Error resetting password:', err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
 
-const sendMail = async (username, email, resetLink) => {
+const sendMail = async (username, email, resetLink,
+        MainText = "You requested a password reset. Click the link below to reset your password:",
+        ResetLinkTitle = "Reset Password Link",
+        IgnoreText = "If you did not request this, please ignore this email."
+    ) => {
     try {
         const result = await mailjetClient
             .post('send', { version: 'v3.1' })
@@ -186,12 +190,12 @@ const sendMail = async (username, email, resetLink) => {
                             },
                         ],
                         Subject: 'Password Reset Link!',
-                        TextPart: resetLink,
+                        // TextPart: resetLink,
                         HTMLPart: `
                             <p>Hello ${username},</p>
-                            <p>You requested a password reset. Click the link below to reset your password:</p>
-                            <a href="${resetLink}">${resetLink}</a>
-                            <p>If you did not request this, please ignore this email.</p>
+                            <p>${MainText}</p>
+                            <a href="${resetLink}">${ResetLinkTitle}</a>
+                            <p>${IgnoreText}</p>
                         `,
                     },
                 ],
@@ -204,7 +208,7 @@ const sendMail = async (username, email, resetLink) => {
 
 // Function to generate and send the password reset link
 export const sendPasswordResetLink = async (req, res) => {
-    const { email } = req.body;
+    const { email, mainUrl=BaseUrl } = req.body;
 
     try {
         // Check if the email exists in the database
@@ -230,13 +234,13 @@ export const sendPasswordResetLink = async (req, res) => {
         await pool.promise().query(sqlInsertToken, [userId, hashedToken, expiresAt, hashedToken, expiresAt]);
 
         // Create a password reset link
-        const resetLink = `${appBaseUrl}/reset-password?token=${resetToken}&userId=${userId}`;
+        const resetLink = `${mainUrl}/set-new-password?token=${resetToken}&userId=${userId}`;
 
         // Sending mail
         sendMail(username, email, resetLink);
 
         res.status(200).json(
-            { 
+            {
                 username: username,
                 message: 'Password reset link sent successfully',
                 email: email

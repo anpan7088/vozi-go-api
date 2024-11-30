@@ -7,7 +7,9 @@ import {
     deleteRide, 
     getDepartList,
     getDestList,
-    getRidesByUserId
+    getRidesByUserId,
+    getDepartTextList, 
+    getDestTextList
 } from './controllers.js';
 
 const router = Router();
@@ -16,6 +18,8 @@ router.get('/', getRides);
 router.get('/user/:id', getRidesByUserId);
 router.get('/driver/:id', getRidesByUserId);
 router.get('/departList', getDepartList);
+router.get('/departTextList', getDepartTextList);
+router.get('/destTextList', getDestTextList);
 router.get('/destList', getDestList);
 router.get('/:id', getRideById);
 router.post('/', createRide);
