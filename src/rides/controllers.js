@@ -4,15 +4,13 @@ import { pool } from '../db/db.mjs';
 const masterQuery = `
     SELECT 
         rides.id AS rideID,
-        depart_mesta.id as depart_mesta_id,
-        dest_mesta.id as dest_mesta_id,
         DATE_FORMAT(rides.start_time, '%Y-%m-%dT%H:%i') start_time,
         DATE_FORMAT(rides.start_time, '%Y-%m-%d') AS depart_date,
         DATE_FORMAT(rides.start_time, '%H:%i') AS depart_time,
-        depart_mesta.city as depart,
-        depart_mesta.country_id as depart_country_id,
-        dest_mesta.city as dest,
-        dest_mesta.country_id as dest_country_id,
+        depart_text as depart,
+        dest_text as dest,
+        depart_text,
+        dest_text,
         users.id as userID,
         users.username username,
         users.firstName,
@@ -27,8 +25,6 @@ const masterQuery = `
         rides.seats as seats_left,
         CASE WHEN rides.start_time < NOW() THEN true ELSE false END AS expired
     FROM rides
-    INNER JOIN mesta AS depart_mesta ON depart_mesta.id=rides.depart
-    INNER JOIN mesta AS dest_mesta ON dest_mesta.id=rides.destination
     INNER JOIN vehicles ON vehicles.id=rides.vehicle_id
     INNER JOIN users ON users.id=vehicles.driver
 `;

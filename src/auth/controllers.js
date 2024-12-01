@@ -234,7 +234,7 @@ export const sendPasswordResetLink = async (req, res) => {
         await pool.promise().query(sqlInsertToken, [userId, hashedToken, expiresAt, hashedToken, expiresAt]);
 
         // Create a password reset link
-        const resetLink = `${mainUrl}/set-new-password?token=${resetToken}&userId=${userId}`;
+        const resetLink = `${mainUrl}/set-new-password?token=${resetToken}&userId=${userId}&username=${username}`;
 
         // Sending mail
         sendMail(username, email, resetLink);

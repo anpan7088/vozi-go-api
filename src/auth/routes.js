@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { registerUser, loginUser,  passwordChange, sendPasswordResetLink, resetPassword } from './controllers.js'; // Adjust the path to the controllers module
+// import { isUser } from '../middlewares/authMiddleware'; // Adjust the path to the middleware module
 
 const router = Router();
 
