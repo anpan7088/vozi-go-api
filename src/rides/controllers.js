@@ -22,6 +22,9 @@ const masterQuery = `
         vehicles.color,
         vehicles.license_plate,
         rides.price,
+        users.tel as driver_tel,
+        users.email as driver_email,
+        users.firstName as driver_name,
         rides.seats as seats_left,
         CASE WHEN rides.start_time < NOW() THEN true ELSE false END AS expired
     FROM rides
