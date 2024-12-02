@@ -61,7 +61,7 @@ export const isAdmin = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token.split(' ')[1], secretKey);
-        console.log('Decoded token:', decoded);
+        // console.log('Decoded token:', decoded);
         req.user = decoded; // Assuming the token payload contains the user object with username and role
 
         if (req.user && ( req.user.role === 'admin' || req.user.role === 'root' )) {
@@ -70,35 +70,51 @@ export const isAdmin = (req, res, next) => {
             res.status(403).json({ error: 'Forbidden: Admins only' });
         }
     } catch (error) {
-        console.error('Error verifying token:', error);
+        // console.error('Error verifying token:', error);
         res.status(401).json({ error: 'Unauthorized: Invalid token' });
     }
 };
 
-// isAdminOrOwner middleware, assuming admin role is 'admin' and role is stored in the token payload
-export const isAdminOrOwner = async (req, res, next) => {
-    const token = req.header('Authorization');
+// isOwnerOrAdmin middleware, assuming user_id and role are stored in the token payload
+// and user_id is provided in the request parameters
+export const isOwnerOrAdmin = async (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
-        return res.status(401).json({ error: 'Unauthorized: No token provided' });
-    }
-
+        return res.status(401).json({ 
+            error: 'Unauthorized: No token provided',
+            tkey: 'UnauthorizedNoToken'
+         });
+    };
     try {
-        const decoded = jwt.verify(token.split(' ')[1], secretKey);
-        req.user = decoded; // Assuming the token payload contains the user object with username and role
-
-        if (req.user && req.user.role === 'admin') {
-            return next();
-        } else {
-            const reviewToDel = req.params.id;
-            const [result] = await pool.promise().query('SELECT user_id FROM dorms_review WHERE id = ?', [reviewToDel]);
-            if (result.length > 0 && result[0].user_id === req.user.id) {
-                return next();
-            } else {
-                return res.status(403).json({ error: 'Forbidden: Admins or Owners only' });
-            }
+        const decoded = jwt.verify(token, secretKey);
+        const userIdFromRequest = Number(req.params.user_id);
+        if (!userIdFromRequest) {
+            return res.status(400).json({ 
+                error: 'Bad Request: No user_id provided',
+                tkey: 'BadRequestNoUserId'
+             });
         }
+        if ( decoded.user_id === userIdFromRequest || decoded.role === 'admin') {
+            return next();
+        }
+        return res.status(403).json({ 
+            error: 'Forbidden: You do not own this profile', 
+            tKey: 'ForbiddenNotOwnerOrAdmin'
+         });
     } catch (error) {
-        console.error('Error verifying token or querying database:', error);
-        return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        // console.error("Error in isProfileOwnerOrAdmin middleware:", error);
+        res.status(401).json({
+            error: 'Unauthorized: Invalid token',
+            details: error.message,
+            tKey: 'UnauthorizedInvalidToken'
+        });
     }
 };
+
+// "decoded": {
+//     "user_id": 1,
+//     "username": "root",
+//     "role": "admin",
+//     "iat": 1733135078,
+//     "exp": 1733156678
+// } 

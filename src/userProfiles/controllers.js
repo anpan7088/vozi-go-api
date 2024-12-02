@@ -1,5 +1,6 @@
 import { pool } from '../db/db.mjs'; // Adjust the path to the db module
 const usersTable = process.env.USERS_TABLE || 'users';
+import jwt from 'jsonwebtoken';
 
 // Get current user profile
 export const getUserProfile = async (req, res) => {
@@ -107,6 +108,31 @@ export const deleteUserProfile = async (req, res) => {
         res.status(500).json({
             error: 'Internal Server Error',
             sqlError: err.sqlMessage,
+        });
+    }
+};
+
+// Secret key for JWT
+const secretKey = process.env.JWT_SECRET_KEY || 'defaultSecretKey-eohfufiufrei';
+
+// PATCH CURRENT USER PROFILE
+export const promoteToDriver = async (req, res) => {
+    // Get user_id from query parameters if present, otherwise use req.user.id
+    const userId = req.params.user_id || req.user.id;
+    const sql = `UPDATE ${usersTable} SET role = 'driver' WHERE id = ?`;
+    try {
+        await pool.promise().query(sql, [userId]);
+        res.json({
+            status: true,
+            message: 'User promoted to driver successfully',
+            tKey: 'UserPromotedToDriver'
+        });
+    } catch (err) {
+        // console.error("Error in SQL query:", err);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
         });
     }
 };
