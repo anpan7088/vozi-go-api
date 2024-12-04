@@ -1,7 +1,7 @@
 // Import necessary modules using ES module syntax
 import express from 'express';
 import { isUser, isProfileOwner, isOwnerOrAdmin } from '../middleware/authMiddleware.js'; // Ensure the .js extension
-import { getUserProfile, listAllUsers, patchUserProfile, deleteUserProfile, promoteToDriver } from './controllers.js'; // Ensure the .js extension
+import { getUserProfile, listAllUsers, patchUserProfile, deleteUserProfile, promoteToDriver, checkEmailExists, checkUserExists } from './controllers.js'; // Ensure the .js extension
 
 const router = express.Router();
 
@@ -12,6 +12,8 @@ router.get("/profilesAll", isUser, listAllUsers);
 router.patch('/profile/:user_id?', isUser, isProfileOwner, patchUserProfile);
 router.delete('/profile/:user_id', isUser, isProfileOwner, deleteUserProfile);
 router.patch('/promote-to-driver/:user_id?', isOwnerOrAdmin, promoteToDriver);
+router.get('/name-exists/:username', checkUserExists);
+router.get('/email-exists/:email', checkEmailExists);
 
 // Export the router using ES module syntax
 export default router;

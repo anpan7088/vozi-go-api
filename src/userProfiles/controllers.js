@@ -1,6 +1,6 @@
 import { pool } from '../db/db.mjs'; // Adjust the path to the db module
 const usersTable = process.env.USERS_TABLE || 'users';
-import jwt from 'jsonwebtoken';
+// import jwt from 'jsonwebtoken';
 
 // Get current user profile
 export const getUserProfile = async (req, res) => {
@@ -21,9 +21,53 @@ export const getUserProfile = async (req, res) => {
         res.status(500).json({
             error: 'Internal Server Error',
             sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
         });
     }
 };
+
+// Check if user name exists
+export const checkUserExists = async (req, res) => {
+    const userId = req.params.username;
+    const sql = `SELECT * FROM ${usersTable} WHERE username = ?`;
+    try {
+        const [results] = await pool.promise().query(sql, [userId]);
+        if (results.length > 0) {
+            res.json({ exists: true });
+        } else {
+            res.json({ exists: false });
+        }
+    } catch (err) {
+        console.error("Error in SQL query:", err);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
+        });
+    }
+};
+
+// Check if email exists
+export const checkEmailExists = async (req, res) => {
+    const email = req.params.email;
+    const sql = `SELECT * FROM ${usersTable} WHERE email = ?`;
+    try {
+        const [results] = await pool.promise().query(sql, [email]);
+        if (results.length > 0) {
+            res.json({ exists: true });
+        } else {
+            res.json({ exists: false });
+        }
+    } catch (err) {
+        console.error("Error in SQL query:", err);
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
+        });
+    }
+};
+
 
 // List all users
 export const listAllUsers = async (req, res) => {
@@ -46,6 +90,7 @@ export const listAllUsers = async (req, res) => {
         res.status(500).json({
             error: 'Internal Server Error',
             sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
         });
     }
 };
@@ -67,7 +112,10 @@ export const patchUserProfile = async (req, res) => {
     }
 
     if (updateFields.length === 0) {
-        return res.status(400).json({ error: 'No fields to update' });
+        return res.status(400).json({ 
+            error: 'No fields to update', 
+            tKey: 'NoFieldsToUpdate' 
+        });
     }
 
     updateValues.push(userId);
@@ -82,11 +130,13 @@ export const patchUserProfile = async (req, res) => {
             status: true,
             message: 'Profile updated successfully',
             values: fieldsToUpdate,
+            tKey: 'PreofileUpdated'
         });
     } catch (err) {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
+            tKey: 'InternalServerError',
             sqlError: err.sqlMessage,
         });
     }
@@ -107,6 +157,7 @@ export const deleteUserProfile = async (req, res) => {
         console.error("Error in SQL query:", err);
         res.status(500).json({
             error: 'Internal Server Error',
+            tKey: 'InternalServerError',
             sqlError: err.sqlMessage,
         });
     }

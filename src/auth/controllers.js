@@ -75,22 +75,42 @@ export const loginUser = async (req, res) => {
             const user = result[0];
 
             // Verify the password
-            const passwordMatch = await bcrypt.compare(password, user.password);
-
-            if (passwordMatch) {
-                // Call the responseTokenGenerator function to generate the response object
-                res.json(responseTokenGenerator(user));
-            } else {
-                // If the password doesn't match, return an error
-                res.status(401).json({ error: 'Invalid credentials' });
-            }
+            await bcrypt.compare(password, user.password)
+                .then( (match) => {
+                    if (match) {
+                        // Call the responseTokenGenerator function to generate the response object
+                        res.json(responseTokenGenerator(user));
+                    } else {
+                        // If the password doesn't match, return an error
+                        res.status(401).json({
+                            error: 'Invalid credentials',
+                            sqlError: err.sqlMessage,
+                            tKey: 'InvalidCredentials'
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    res.status(500).json({
+                        error: 'Wrong password!',
+                        sqlError: err.sqlMessage,
+                        tKey: 'WrongPassword'
+                    });
+                });
         } else {
             // If no user is found, return an error
-            res.status(401).json({ error: 'Invalid credentials' });
+            res.status(401).json({
+                error: 'User not found',
+                tKey: 'UserNotFound'
+            });
         }
     } catch (err) {
         // If some other error occurs, return a generic error message
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
+        });
     }
 };
 
@@ -105,7 +125,10 @@ export const passwordChange = async (req, res) => {
 
         if (result.length === 0) {
             // If no user is found, return an error
-            return res.status(404).json({ error: 'User not found' });
+            return res.status(404).json({
+                error: 'User not found',
+                tKey: 'UserNotFound'
+            });
         }
 
         const { password: currentHashedPassword } = result[0];
@@ -114,7 +137,10 @@ export const passwordChange = async (req, res) => {
         const isMatch = await bcrypt.compare(oldPassword, currentHashedPassword);
         if (!isMatch) {
             // If the old password doesn't match, return an error
-            return res.status(401).json({ error: 'Old password is incorrect' });
+            return res.status(401).json({
+                error: 'Old password is incorrect',
+                tKey: 'OldPasswordIncorrect'
+            });
         }
 
         // Hash the new password
@@ -124,10 +150,16 @@ export const passwordChange = async (req, res) => {
         const sqlUpdatePassword = `UPDATE ${usersTable} SET password = ? WHERE id = ?`;
         await pool.promise().query(sqlUpdatePassword, [hashedNewPassword, userId]);
 
-        res.status(200).json({ message: 'Password changed successfully' });
+        res.status(200).json({
+            message: 'Password changed successfully',
+            tKey: 'PasswordChanged'
+        });
     } catch (err) {
-        console.error('Error in changePassword:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
+        });
     }
 };
 
@@ -135,7 +167,7 @@ export const resetPassword = async (req, res) => {
     const { token, userId, newPassword } = req.body;
 
     try {
-        console.log('Received resetPassword request:', req.body);
+        // console.log('Received resetPassword request:', req.body);
         // Hash the received token for secure comparison
         const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
@@ -147,7 +179,10 @@ export const resetPassword = async (req, res) => {
         const [tokens] = await pool.promise().query(sqlFetchToken, [hashedToken, userId]);
 
         if (tokens.length === 0) {
-            return res.status(400).json({ error: 'InvalidOrExpiredToken' });
+            return res.status(400).json({
+                error: 'InvalidOrExpiredToken',
+                tKey: 'InvalidOrExpiredToken'
+            });
         }
 
         // Hash the new password
@@ -161,18 +196,25 @@ export const resetPassword = async (req, res) => {
         const sqlDeleteToken = `DELETE FROM ${resetTable} WHERE token = ?`;
         await pool.promise().query(sqlDeleteToken, [hashedToken]);
 
-        res.status(200).json({ message: 'PasswordResetSuccessfully' });
+        res.status(200).json({
+            message: 'PasswordResetSuccessfully',
+            tKey: 'PasswordReseted'
+        });
     } catch (err) {
         console.error('Error resetting password:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
+        });
     }
 };
 
 const sendMail = async (username, email, resetLink,
-        MainText = "You requested a password reset. Click the link below to reset your password:",
-        ResetLinkTitle = "Reset Password Link",
-        IgnoreText = "If you did not request this, please ignore this email."
-    ) => {
+    MainText = "You requested a password reset. Click the link below to reset your password:",
+    ResetLinkTitle = "Reset Password Link",
+    IgnoreText = "If you did not request this, please ignore this email."
+) => {
     try {
         const result = await mailjetClient
             .post('send', { version: 'v3.1' })
@@ -208,7 +250,7 @@ const sendMail = async (username, email, resetLink,
 
 // Function to generate and send the password reset link
 export const sendPasswordResetLink = async (req, res) => {
-    const { email, mainUrl=BaseUrl } = req.body;
+    const { email, mainUrl = BaseUrl } = req.body;
 
     try {
         // Check if the email exists in the database
@@ -216,7 +258,10 @@ export const sendPasswordResetLink = async (req, res) => {
         const [users] = await pool.promise().query(sqlFetchUser, [email]);
 
         if (users.length === 0) {
-            return res.status(404).json({ error: 'Email not found' });
+            return res.status(404).json({
+                error: 'Email not found',
+                tKey: 'EmailNotFound'
+            });
         }
 
         const { id: userId, username } = users[0];
@@ -243,11 +288,16 @@ export const sendPasswordResetLink = async (req, res) => {
             {
                 username: username,
                 message: 'Password reset link sent successfully',
+                tKey: 'PasswordResetLinkSent',
                 email: email
             });
     } catch (err) {
         console.error('Error sending password reset link:', err);
-        res.status(500).json({ error: 'Internal Server Error' });
+        res.status(500).json({
+            error: 'Internal Server Error',
+            sqlError: err.sqlMessage,
+            tKey: 'InternalServerError'
+        });
     }
 };
 
@@ -260,7 +310,3 @@ export default {
     resetPassword,
     sendPasswordResetLink,
 };
-
-
-// API key: c4266a882d0a75b0cd65cb6769f7cad4 
-// Secret key: c1701974b2b0e78e90ada7ace47e5b3c
