@@ -20,6 +20,7 @@ const PORT = process.env.PORT || 8088;
 // for production, you can use 'https://vozi-go.sman.cloud' and all localhost other URLs should be blocked
 const corsOptions = {
     origin: [
+        'https://vozigo.com',
         'https://vozi-go.sman.cloud', 
         'http://localhost:5173',
         'http://localhost:5174',

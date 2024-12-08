@@ -291,7 +291,7 @@ export const getRideById = async (req, res) => {
 // Get a rides by User ID
 export const getRidesByUserId = async (req, res) => {
     const { id } = req.params;
-    const sql = masterQuery + " WHERE users.id  = ?";
+    const sql = masterQuery + " WHERE users.id  = ? ORDER BY rides.start_time DESC";
     try {
         const [result] = await pool.promise().query(sql, [id]);
         res.json(result);

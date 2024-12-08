@@ -91,7 +91,7 @@ export const loginUser = async (req, res) => {
                 })
                 .catch(err => {
                     console.log(err);
-                    res.status(500).json({
+                    res.status(401).json({
                         error: 'Wrong password!',
                         sqlError: err.sqlMessage,
                         tKey: 'WrongPassword'
@@ -100,7 +100,7 @@ export const loginUser = async (req, res) => {
         } else {
             // If no user is found, return an error
             res.status(401).json({
-                error: 'User not found',
+                error: 'User not found!',
                 tKey: 'UserNotFound'
             });
         }
