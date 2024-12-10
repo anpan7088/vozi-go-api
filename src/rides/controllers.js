@@ -11,6 +11,7 @@ const masterQuery = `
         dest_text as dest,
         depart_text,
         dest_text,
+        comment,
         users.id as userID,
         users.username username,
         users.firstName,
