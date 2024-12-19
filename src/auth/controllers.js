@@ -222,7 +222,7 @@ const sendMail = async (username, email, resetLink,
                 Messages: [
                     {
                         From: {
-                            Email: 'support@vozi-go.sman.cloud',
+                            Email: 'support@vozigo.com',
                             Name: 'VoziGo Support',
                         },
                         To: [

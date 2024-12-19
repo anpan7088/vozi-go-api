@@ -17,15 +17,14 @@ const PORT = process.env.PORT || 8088;
 
 // Define allowed origins for CORS based on environment
 // for development, you can use 'http://localhost:5173' and 'http://localhost:5174'
-// for production, you can use 'https://vozi-go.sman.cloud' and all localhost other URLs should be blocked
+// for production, you can use 'https://vozigo.com' and all localhost other URLs should be blocked
 const corsOptions = {
     origin: [
         'https://vozigo.com',
-        'https://vozi-go.sman.cloud', 
+        // 'https://vozi-go.sman.cloud', // Replace with your production domain
         'http://localhost:5173',
         'http://localhost:5174',
-        'http://158.220.121.142:5173/',
-        'http://158.220.121.142:5174',
+        'http://192.168.100.8:5173'
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
@@ -40,7 +39,7 @@ app.use(urlencoded({ extended: true }));
 
 // Root route
 app.get("/", (req, res) => {
-    res.send({ "message": "Welcome to Vozi-Go API!" });
+    res.send({ "message": "Welcome to VoziGo API!" });
 });
 
 // Serve static files from the 'public' directory
