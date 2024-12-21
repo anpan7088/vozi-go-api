@@ -21,7 +21,8 @@ const PORT = process.env.PORT || 8088;
 const corsOptions = {
     origin: [
         'https://vozigo.com',
-        // 'https://vozi-go.sman.cloud', // Replace with your production domain
+        'https://test.vozigo.com',
+        'https://vozi-go.sman.cloud',
         'http://localhost:5173',
         'http://localhost:5174',
         'http://192.168.100.8:5173'
