@@ -1,12 +1,12 @@
-# drm_api
+# vozi_go_api
 
-## Dorms Review API
+## VoziGo API
 
 To begin development download this repo as a .zip or:
 
 ```bash
-gh repo clone anpan7088/drm_api
-cd drm_api
+gh repo clone anpan7088/vozi_go_api
+cd vozi_go_api
 yarn 
 ```
 
